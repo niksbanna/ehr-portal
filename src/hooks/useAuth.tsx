@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types/index';
-import { api } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
@@ -15,20 +14,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const currentUser = api.getCurrentUser();
-    setUser(currentUser);
+    // Check if user is already logged in
+    const token = localStorage.getItem('auth_token');
+    const savedUser = localStorage.getItem('current_user');
+    if (token && savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch (error) {
+        console.error('Failed to parse saved user', error);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('current_user');
+      }
+    }
   }, []);
 
   const login = async (email: string, password: string) => {
-    const user = await api.login(email, password);
-    localStorage.setItem('auth_token', 'mock_token');
-    setUser(user);
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Invalid credentials');
+    }
+
+    const { data } = await response.json();
+    localStorage.setItem('auth_token', data.token);
+    localStorage.setItem('current_user', JSON.stringify(data.user));
+    setUser(data.user);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ token }),
+        });
+      } catch (error) {
+        console.error('Logout request failed', error);
+      }
+    }
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_user');
     setUser(null);
-    api.logout();
   };
 
   return (
