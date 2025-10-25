@@ -98,7 +98,7 @@ const ReportsPage = () => {
 
   const renderReportContent = () => {
     switch (selectedReport) {
-      case 'revenue':
+      case 'revenue': {
         const revenueData = getRevenueData();
         return (
           <div className="space-y-4">
@@ -121,8 +121,9 @@ const ReportsPage = () => {
             </div>
           </div>
         );
+      }
 
-      case 'patients':
+      case 'patients': {
         const patientData = getPatientData();
         return (
           <div className="space-y-4">
@@ -142,8 +143,9 @@ const ReportsPage = () => {
             </div>
           </div>
         );
+      }
 
-      case 'encounters':
+      case 'encounters': {
         const encounterData = getEncounterData();
         return (
           <div className="space-y-4">
@@ -167,8 +169,9 @@ const ReportsPage = () => {
             </div>
           </div>
         );
+      }
 
-      case 'labs':
+      case 'labs': {
         const labData = getLabData();
         return (
           <div className="space-y-4">
@@ -192,6 +195,9 @@ const ReportsPage = () => {
             </div>
           </div>
         );
+      }
+      default:
+        return null;
     }
   };
 
