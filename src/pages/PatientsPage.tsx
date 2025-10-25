@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus, Edit, Trash2, X, AlertTriangle } from 'lucide-react';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { Patient } from '../types/index';
+import { PatientFormSchema, PatientFormData } from '../schemas/patient-form.schema';
+import { maskAadhaar, formatIndianMobile, formatToDDMMYYYY } from '../schemas/fhir.schema';
+import { findDuplicatePatients } from '../utils/duplicate-detection';
 
 const PatientsPage = () => {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [duplicateWarning, setDuplicateWarning] = useState<Patient[]>([]);
   
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Omit<Patient, 'id' | 'registrationDate'>>();
+  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<PatientFormData>({
+    resolver: zodResolver(PatientFormSchema),
+  });
 
   const { data: patients, isLoading } = useQuery({
     queryKey: ['patients'],
@@ -19,10 +26,11 @@ const PatientsPage = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: Omit<Patient, 'id' | 'registrationDate'>) => api.createPatient(data),
+    mutationFn: (data: PatientFormData) => api.createPatient(data as Omit<Patient, 'id' | 'registrationDate'>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       setShowModal(false);
+      setDuplicateWarning([]);
       reset();
     },
   });
@@ -34,6 +42,7 @@ const PatientsPage = () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       setShowModal(false);
       setEditingPatient(null);
+      setDuplicateWarning([]);
       reset();
     },
   });
@@ -45,9 +54,27 @@ const PatientsPage = () => {
     },
   });
 
-  const onSubmit = (data: Omit<Patient, 'id' | 'registrationDate'>) => {
+  const onSubmit = (data: PatientFormData) => {
+    // Check for duplicates before saving
+    const patientToCheck: Patient = {
+      ...data,
+      id: editingPatient?.id || '',
+      registrationDate: editingPatient?.registrationDate || '',
+    };
+    
+    const duplicates = findDuplicatePatients(
+      patientToCheck, 
+      patients || [], 
+      editingPatient?.id
+    );
+    
+    if (duplicates.length > 0 && !duplicateWarning.length) {
+      setDuplicateWarning(duplicates);
+      return;
+    }
+    
     if (editingPatient) {
-      updateMutation.mutate({ ...data, id: editingPatient.id });
+      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & { id: string });
     } else {
       createMutation.mutate(data);
     }
@@ -68,7 +95,17 @@ const PatientsPage = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingPatient(null);
+    setDuplicateWarning([]);
     reset();
+  };
+
+  const handleForceSave = () => {
+    const data = watch();
+    if (editingPatient) {
+      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & { id: string });
+    } else {
+      createMutation.mutate(data as PatientFormData);
+    }
   };
 
   return (
@@ -102,8 +139,8 @@ const PatientsPage = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">DOB</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aadhaar</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">City</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Blood Group</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
@@ -123,13 +160,13 @@ const PatientsPage = () => {
                       {patient.dateOfBirth}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {patient.phone}
+                      {formatIndianMobile(patient.phone)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-mono">
+                      {patient.aadhaar ? maskAadhaar(patient.aadhaar) : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {patient.city}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                      {patient.bloodGroup || 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       <div className="flex gap-2">
@@ -167,13 +204,52 @@ const PatientsPage = () => {
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+                {duplicateWarning.length > 0 && (
+                  <div className="bg-yellow-50 border border-yellow-400 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="text-yellow-600 mt-0.5" size={20} />
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-yellow-800 mb-1">
+                          Potential Duplicate Patient Detected
+                        </h3>
+                        <p className="text-sm text-yellow-700 mb-2">
+                          A patient with the same name, date of birth, and phone number already exists:
+                        </p>
+                        <ul className="text-sm text-yellow-700 space-y-1">
+                          {duplicateWarning.map((dup) => (
+                            <li key={dup.id} className="font-medium">
+                              {dup.id} - {dup.firstName} {dup.lastName} ({dup.dateOfBirth})
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={handleForceSave}
+                            className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700"
+                          >
+                            Save Anyway
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDuplicateWarning([])}
+                            className="px-3 py-1 bg-white border border-yellow-600 text-yellow-700 rounded text-sm hover:bg-yellow-50"
+                          >
+                            Review & Edit
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       First Name *
                     </label>
                     <input
-                      {...register('firstName', { required: 'First name is required' })}
+                      {...register('firstName')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.firstName && (
@@ -186,7 +262,7 @@ const PatientsPage = () => {
                       Last Name *
                     </label>
                     <input
-                      {...register('lastName', { required: 'Last name is required' })}
+                      {...register('lastName')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.lastName && (
@@ -196,11 +272,12 @@ const PatientsPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date of Birth *
+                      Date of Birth (DD-MM-YYYY) *
                     </label>
                     <input
-                      type="date"
-                      {...register('dateOfBirth', { required: 'Date of birth is required' })}
+                      type="text"
+                      placeholder="DD-MM-YYYY"
+                      {...register('dateOfBirth')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.dateOfBirth && (
@@ -213,7 +290,7 @@ const PatientsPage = () => {
                       Gender *
                     </label>
                     <select
-                      {...register('gender', { required: 'Gender is required' })}
+                      {...register('gender')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">Select Gender</option>
@@ -228,10 +305,12 @@ const PatientsPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone *
+                      Phone (+91 format) *
                     </label>
                     <input
-                      {...register('phone', { required: 'Phone is required' })}
+                      type="tel"
+                      placeholder="+919876543210 or 9876543210"
+                      {...register('phone')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.phone && (
@@ -245,12 +324,29 @@ const PatientsPage = () => {
                     </label>
                     <input
                       type="email"
-                      {...register('email', { required: 'Email is required' })}
+                      {...register('email')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.email && (
                       <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
                     )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Aadhaar Number (12 digits)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="123456789012"
+                      maxLength={12}
+                      {...register('aadhaar')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono"
+                    />
+                    {errors.aadhaar && (
+                      <p className="text-sm text-red-600 mt-1">{errors.aadhaar.message}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">Will be masked as XXXX-XXXX-XXXX</p>
                   </div>
                 </div>
 
@@ -259,7 +355,7 @@ const PatientsPage = () => {
                     Address *
                   </label>
                   <input
-                    {...register('address', { required: 'Address is required' })}
+                    {...register('address')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                   {errors.address && (
@@ -273,7 +369,7 @@ const PatientsPage = () => {
                       City *
                     </label>
                     <input
-                      {...register('city', { required: 'City is required' })}
+                      {...register('city')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.city && (
@@ -286,7 +382,7 @@ const PatientsPage = () => {
                       State *
                     </label>
                     <input
-                      {...register('state', { required: 'State is required' })}
+                      {...register('state')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.state && (
@@ -296,10 +392,13 @@ const PatientsPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Pincode *
+                      Pincode (6 digits) *
                     </label>
                     <input
-                      {...register('pincode', { required: 'Pincode is required' })}
+                      type="text"
+                      maxLength={6}
+                      placeholder="400001"
+                      {...register('pincode')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.pincode && (
@@ -314,7 +413,7 @@ const PatientsPage = () => {
                       Emergency Contact *
                     </label>
                     <input
-                      {...register('emergencyContact', { required: 'Emergency contact is required' })}
+                      {...register('emergencyContact')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.emergencyContact && (
@@ -327,7 +426,9 @@ const PatientsPage = () => {
                       Emergency Phone *
                     </label>
                     <input
-                      {...register('emergencyPhone', { required: 'Emergency phone is required' })}
+                      type="tel"
+                      placeholder="+919876543210"
+                      {...register('emergencyPhone')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                     {errors.emergencyPhone && (
