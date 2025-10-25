@@ -7,7 +7,7 @@ import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { Patient } from '../types/index';
 import { PatientFormSchema, PatientFormData } from '../schemas/patient-form.schema';
-import { maskAadhaar, formatIndianMobile, formatToDDMMYYYY } from '../schemas/fhir.schema';
+import { maskAadhaar, formatIndianMobile } from '../schemas/fhir.schema';
 import { findDuplicatePatients } from '../utils/duplicate-detection';
 
 const PatientsPage = () => {

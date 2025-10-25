@@ -1,5 +1,4 @@
 import { Patient } from '../types/index';
-import { parseDDMMYYYY } from '../schemas/fhir.schema';
 
 /**
  * Normalize string for comparison (lowercase, trim, remove extra spaces)

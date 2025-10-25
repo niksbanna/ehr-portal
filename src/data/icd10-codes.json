@@ -1,0 +1,240 @@
+{
+  "description": "Common ICD-10 diagnosis codes for Indian hospitals",
+  "codes": [
+    {
+      "code": "A09",
+      "category": "Infectious Diseases",
+      "description": "Diarrhoea and gastroenteritis of presumed infectious origin"
+    },
+    {
+      "code": "A09.0",
+      "category": "Infectious Diseases",
+      "description": "Other and unspecified gastroenteritis and colitis of infectious origin"
+    },
+    {
+      "code": "J00",
+      "category": "Respiratory",
+      "description": "Acute nasopharyngitis [common cold]"
+    },
+    {
+      "code": "J03.9",
+      "category": "Respiratory",
+      "description": "Acute tonsillitis, unspecified"
+    },
+    {
+      "code": "J06.9",
+      "category": "Respiratory",
+      "description": "Acute upper respiratory infection, unspecified"
+    },
+    {
+      "code": "J18.9",
+      "category": "Respiratory",
+      "description": "Pneumonia, unspecified organism"
+    },
+    {
+      "code": "J45.9",
+      "category": "Respiratory",
+      "description": "Asthma, unspecified"
+    },
+    {
+      "code": "J96.9",
+      "category": "Respiratory",
+      "description": "Respiratory failure, unspecified"
+    },
+    {
+      "code": "E11.9",
+      "category": "Endocrine",
+      "description": "Type 2 diabetes mellitus without complications"
+    },
+    {
+      "code": "E11.65",
+      "category": "Endocrine",
+      "description": "Type 2 diabetes mellitus with hyperglycemia"
+    },
+    {
+      "code": "E78.5",
+      "category": "Endocrine",
+      "description": "Hyperlipidaemia, unspecified"
+    },
+    {
+      "code": "I10",
+      "category": "Cardiovascular",
+      "description": "Essential (primary) hypertension"
+    },
+    {
+      "code": "I25.1",
+      "category": "Cardiovascular",
+      "description": "Atherosclerotic heart disease of native coronary artery"
+    },
+    {
+      "code": "I25.10",
+      "category": "Cardiovascular",
+      "description": "Atherosclerotic heart disease without angina pectoris"
+    },
+    {
+      "code": "I21.9",
+      "category": "Cardiovascular",
+      "description": "Acute myocardial infarction, unspecified"
+    },
+    {
+      "code": "I50.9",
+      "category": "Cardiovascular",
+      "description": "Heart failure, unspecified"
+    },
+    {
+      "code": "K29.7",
+      "category": "Gastrointestinal",
+      "description": "Gastritis, unspecified"
+    },
+    {
+      "code": "K30",
+      "category": "Gastrointestinal",
+      "description": "Functional dyspepsia"
+    },
+    {
+      "code": "K59.0",
+      "category": "Gastrointestinal",
+      "description": "Constipation"
+    },
+    {
+      "code": "K80.20",
+      "category": "Gastrointestinal",
+      "description": "Calculus of gallbladder without cholecystitis"
+    },
+    {
+      "code": "R10.4",
+      "category": "Symptoms",
+      "description": "Other and unspecified abdominal pain"
+    },
+    {
+      "code": "R11",
+      "category": "Symptoms",
+      "description": "Nausea and vomiting"
+    },
+    {
+      "code": "R50.9",
+      "category": "Symptoms",
+      "description": "Fever, unspecified"
+    },
+    {
+      "code": "R51",
+      "category": "Symptoms",
+      "description": "Headache"
+    },
+    {
+      "code": "R53.83",
+      "category": "Symptoms",
+      "description": "Other fatigue"
+    },
+    {
+      "code": "R06.02",
+      "category": "Symptoms",
+      "description": "Shortness of breath"
+    },
+    {
+      "code": "M25.5",
+      "category": "Musculoskeletal",
+      "description": "Pain in joint"
+    },
+    {
+      "code": "M54.5",
+      "category": "Musculoskeletal",
+      "description": "Low back pain"
+    },
+    {
+      "code": "M79.3",
+      "category": "Musculoskeletal",
+      "description": "Panniculitis, unspecified"
+    },
+    {
+      "code": "M79.1",
+      "category": "Musculoskeletal",
+      "description": "Myalgia"
+    },
+    {
+      "code": "N39.0",
+      "category": "Genitourinary",
+      "description": "Urinary tract infection, site not specified"
+    },
+    {
+      "code": "N18.9",
+      "category": "Genitourinary",
+      "description": "Chronic kidney disease, unspecified"
+    },
+    {
+      "code": "L30.9",
+      "category": "Dermatology",
+      "description": "Dermatitis, unspecified"
+    },
+    {
+      "code": "L50.9",
+      "category": "Dermatology",
+      "description": "Urticaria, unspecified"
+    },
+    {
+      "code": "H10.9",
+      "category": "Ophthalmology",
+      "description": "Conjunctivitis, unspecified"
+    },
+    {
+      "code": "H66.9",
+      "category": "ENT",
+      "description": "Otitis media, unspecified"
+    },
+    {
+      "code": "G43.9",
+      "category": "Neurology",
+      "description": "Migraine, unspecified"
+    },
+    {
+      "code": "G44.1",
+      "category": "Neurology",
+      "description": "Vascular headache, not elsewhere classified"
+    },
+    {
+      "code": "Z48.8",
+      "category": "Follow-up",
+      "description": "Other specified surgical follow-up care"
+    },
+    {
+      "code": "Z51.89",
+      "category": "Follow-up",
+      "description": "Other specified medical care"
+    },
+    {
+      "code": "Z00.00",
+      "category": "Preventive",
+      "description": "Encounter for general adult medical examination without abnormal findings"
+    },
+    {
+      "code": "Z13.9",
+      "category": "Preventive",
+      "description": "Encounter for screening, unspecified"
+    },
+    {
+      "code": "B34.9",
+      "category": "Infectious Diseases",
+      "description": "Viral infection, unspecified"
+    },
+    {
+      "code": "O80",
+      "category": "Obstetrics",
+      "description": "Encounter for full-term uncomplicated delivery"
+    },
+    {
+      "code": "O09.9",
+      "category": "Obstetrics",
+      "description": "Pregnancy, unspecified trimester"
+    },
+    {
+      "code": "F41.9",
+      "category": "Mental Health",
+      "description": "Anxiety disorder, unspecified"
+    },
+    {
+      "code": "F32.9",
+      "category": "Mental Health",
+      "description": "Major depressive disorder, single episode, unspecified"
+    }
+  ]
+}
