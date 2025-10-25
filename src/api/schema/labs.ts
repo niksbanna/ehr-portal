@@ -2,7 +2,14 @@
  * Lab Results API Schema
  */
 
-import { ApiResponse, PaginatedResponse, Endpoint, PaginationParams, SortParams, FilterParams } from './common';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  Endpoint,
+  PaginationParams,
+  SortParams,
+  FilterParams,
+} from './common';
 import { LabResult } from '../../types/index';
 
 // Request/Response Types

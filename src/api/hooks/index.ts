@@ -2,11 +2,17 @@
  * React Query hooks for API endpoints
  */
 
-import { useQuery, useMutation, useQueryClient, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+  UseMutationOptions,
+} from '@tanstack/react-query';
 import { Patient, Encounter, LabResult, Prescription } from '../../types/index';
-import { 
-  PaginatedResponse, 
-  ApiResponse, 
+import {
+  PaginatedResponse,
+  ApiResponse,
   GetPatientsParams,
   GetEncountersParams,
   GetLabResultsParams,
@@ -47,7 +53,10 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 // Patient hooks
-export function usePatients(params?: GetPatientsParams, options?: UseQueryOptions<PaginatedResponse<Patient>>) {
+export function usePatients(
+  params?: GetPatientsParams,
+  options?: UseQueryOptions<PaginatedResponse<Patient>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Patient>>({
     queryKey: ['patients', params],
@@ -65,13 +74,16 @@ export function usePatient(id: string, options?: UseQueryOptions<ApiResponse<Pat
   });
 }
 
-export function useCreatePatient(options?: UseMutationOptions<ApiResponse<Patient>, Error, CreatePatientRequest>) {
+export function useCreatePatient(
+  options?: UseMutationOptions<ApiResponse<Patient>, Error, CreatePatientRequest>
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<Patient>, Error, CreatePatientRequest>({
-    mutationFn: (data) => fetchJson<ApiResponse<Patient>>('/api/patients', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data) =>
+      fetchJson<ApiResponse<Patient>>('/api/patients', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
     },
@@ -79,13 +91,20 @@ export function useCreatePatient(options?: UseMutationOptions<ApiResponse<Patien
   });
 }
 
-export function useUpdatePatient(options?: UseMutationOptions<ApiResponse<Patient>, Error, { id: string; data: UpdatePatientRequest }>) {
+export function useUpdatePatient(
+  options?: UseMutationOptions<
+    ApiResponse<Patient>,
+    Error,
+    { id: string; data: UpdatePatientRequest }
+  >
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<Patient>, Error, { id: string; data: UpdatePatientRequest }>({
-    mutationFn: ({ id, data }) => fetchJson<ApiResponse<Patient>>(`/api/patients/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: ({ id, data }) =>
+      fetchJson<ApiResponse<Patient>>(`/api/patients/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       queryClient.invalidateQueries({ queryKey: ['patients', variables.id] });
@@ -94,12 +113,15 @@ export function useUpdatePatient(options?: UseMutationOptions<ApiResponse<Patien
   });
 }
 
-export function useDeletePatient(options?: UseMutationOptions<ApiResponse<{ message: string }>, Error, string>) {
+export function useDeletePatient(
+  options?: UseMutationOptions<ApiResponse<{ message: string }>, Error, string>
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<{ message: string }>, Error, string>({
-    mutationFn: (id) => fetchJson<ApiResponse<{ message: string }>>(`/api/patients/${id}`, {
-      method: 'DELETE',
-    }),
+    mutationFn: (id) =>
+      fetchJson<ApiResponse<{ message: string }>>(`/api/patients/${id}`, {
+        method: 'DELETE',
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
     },
@@ -108,7 +130,10 @@ export function useDeletePatient(options?: UseMutationOptions<ApiResponse<{ mess
 }
 
 // Encounter hooks
-export function useEncounters(params?: GetEncountersParams, options?: UseQueryOptions<PaginatedResponse<Encounter>>) {
+export function useEncounters(
+  params?: GetEncountersParams,
+  options?: UseQueryOptions<PaginatedResponse<Encounter>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Encounter>>({
     queryKey: ['encounters', params],
@@ -126,23 +151,33 @@ export function useEncounter(id: string, options?: UseQueryOptions<ApiResponse<E
   });
 }
 
-export function usePatientEncounters(patientId: string, params?: { page?: number; limit?: number }, options?: UseQueryOptions<PaginatedResponse<Encounter>>) {
+export function usePatientEncounters(
+  patientId: string,
+  params?: { page?: number; limit?: number },
+  options?: UseQueryOptions<PaginatedResponse<Encounter>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Encounter>>({
     queryKey: ['patients', patientId, 'encounters', params],
-    queryFn: () => fetchJson<PaginatedResponse<Encounter>>(`/api/patients/${patientId}/encounters?${queryString}`),
+    queryFn: () =>
+      fetchJson<PaginatedResponse<Encounter>>(
+        `/api/patients/${patientId}/encounters?${queryString}`
+      ),
     enabled: !!patientId,
     ...options,
   });
 }
 
-export function useCreateEncounter(options?: UseMutationOptions<ApiResponse<Encounter>, Error, CreateEncounterRequest>) {
+export function useCreateEncounter(
+  options?: UseMutationOptions<ApiResponse<Encounter>, Error, CreateEncounterRequest>
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<Encounter>, Error, CreateEncounterRequest>({
-    mutationFn: (data) => fetchJson<ApiResponse<Encounter>>('/api/encounters', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data) =>
+      fetchJson<ApiResponse<Encounter>>('/api/encounters', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['encounters'] });
     },
@@ -150,13 +185,20 @@ export function useCreateEncounter(options?: UseMutationOptions<ApiResponse<Enco
   });
 }
 
-export function useUpdateEncounter(options?: UseMutationOptions<ApiResponse<Encounter>, Error, { id: string; data: UpdateEncounterRequest }>) {
+export function useUpdateEncounter(
+  options?: UseMutationOptions<
+    ApiResponse<Encounter>,
+    Error,
+    { id: string; data: UpdateEncounterRequest }
+  >
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<Encounter>, Error, { id: string; data: UpdateEncounterRequest }>({
-    mutationFn: ({ id, data }) => fetchJson<ApiResponse<Encounter>>(`/api/encounters/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: ({ id, data }) =>
+      fetchJson<ApiResponse<Encounter>>(`/api/encounters/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['encounters'] });
       queryClient.invalidateQueries({ queryKey: ['encounters', variables.id] });
@@ -166,7 +208,10 @@ export function useUpdateEncounter(options?: UseMutationOptions<ApiResponse<Enco
 }
 
 // Lab result hooks
-export function useLabResults(params?: GetLabResultsParams, options?: UseQueryOptions<PaginatedResponse<LabResult>>) {
+export function useLabResults(
+  params?: GetLabResultsParams,
+  options?: UseQueryOptions<PaginatedResponse<LabResult>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<LabResult>>({
     queryKey: ['labs', params],
@@ -184,23 +229,31 @@ export function useLabResult(id: string, options?: UseQueryOptions<ApiResponse<L
   });
 }
 
-export function usePatientLabResults(patientId: string, params?: { page?: number; limit?: number }, options?: UseQueryOptions<PaginatedResponse<LabResult>>) {
+export function usePatientLabResults(
+  patientId: string,
+  params?: { page?: number; limit?: number },
+  options?: UseQueryOptions<PaginatedResponse<LabResult>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<LabResult>>({
     queryKey: ['patients', patientId, 'labs', params],
-    queryFn: () => fetchJson<PaginatedResponse<LabResult>>(`/api/patients/${patientId}/labs?${queryString}`),
+    queryFn: () =>
+      fetchJson<PaginatedResponse<LabResult>>(`/api/patients/${patientId}/labs?${queryString}`),
     enabled: !!patientId,
     ...options,
   });
 }
 
-export function useCreateLabResult(options?: UseMutationOptions<ApiResponse<LabResult>, Error, CreateLabResultRequest>) {
+export function useCreateLabResult(
+  options?: UseMutationOptions<ApiResponse<LabResult>, Error, CreateLabResultRequest>
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<LabResult>, Error, CreateLabResultRequest>({
-    mutationFn: (data) => fetchJson<ApiResponse<LabResult>>('/api/labs', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data) =>
+      fetchJson<ApiResponse<LabResult>>('/api/labs', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['labs'] });
     },
@@ -208,13 +261,20 @@ export function useCreateLabResult(options?: UseMutationOptions<ApiResponse<LabR
   });
 }
 
-export function useUpdateLabResult(options?: UseMutationOptions<ApiResponse<LabResult>, Error, { id: string; data: UpdateLabResultRequest }>) {
+export function useUpdateLabResult(
+  options?: UseMutationOptions<
+    ApiResponse<LabResult>,
+    Error,
+    { id: string; data: UpdateLabResultRequest }
+  >
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<LabResult>, Error, { id: string; data: UpdateLabResultRequest }>({
-    mutationFn: ({ id, data }) => fetchJson<ApiResponse<LabResult>>(`/api/labs/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: ({ id, data }) =>
+      fetchJson<ApiResponse<LabResult>>(`/api/labs/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['labs'] });
       queryClient.invalidateQueries({ queryKey: ['labs', variables.id] });
@@ -224,7 +284,10 @@ export function useUpdateLabResult(options?: UseMutationOptions<ApiResponse<LabR
 }
 
 // Prescription hooks
-export function usePrescriptions(params?: GetPrescriptionsParams, options?: UseQueryOptions<PaginatedResponse<Prescription>>) {
+export function usePrescriptions(
+  params?: GetPrescriptionsParams,
+  options?: UseQueryOptions<PaginatedResponse<Prescription>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Prescription>>({
     queryKey: ['prescriptions', params],
@@ -242,23 +305,33 @@ export function usePrescription(id: string, options?: UseQueryOptions<ApiRespons
   });
 }
 
-export function usePatientPrescriptions(patientId: string, params?: { page?: number; limit?: number }, options?: UseQueryOptions<PaginatedResponse<Prescription>>) {
+export function usePatientPrescriptions(
+  patientId: string,
+  params?: { page?: number; limit?: number },
+  options?: UseQueryOptions<PaginatedResponse<Prescription>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Prescription>>({
     queryKey: ['patients', patientId, 'prescriptions', params],
-    queryFn: () => fetchJson<PaginatedResponse<Prescription>>(`/api/patients/${patientId}/prescriptions?${queryString}`),
+    queryFn: () =>
+      fetchJson<PaginatedResponse<Prescription>>(
+        `/api/patients/${patientId}/prescriptions?${queryString}`
+      ),
     enabled: !!patientId,
     ...options,
   });
 }
 
-export function useCreatePrescription(options?: UseMutationOptions<ApiResponse<Prescription>, Error, CreatePrescriptionRequest>) {
+export function useCreatePrescription(
+  options?: UseMutationOptions<ApiResponse<Prescription>, Error, CreatePrescriptionRequest>
+) {
   const queryClient = useQueryClient();
   return useMutation<ApiResponse<Prescription>, Error, CreatePrescriptionRequest>({
-    mutationFn: (data) => fetchJson<ApiResponse<Prescription>>('/api/prescriptions', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+    mutationFn: (data) =>
+      fetchJson<ApiResponse<Prescription>>('/api/prescriptions', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['prescriptions'] });
     },
@@ -267,7 +340,10 @@ export function useCreatePrescription(options?: UseMutationOptions<ApiResponse<P
 }
 
 // Drug hooks
-export function useDrugs(params?: GetDrugsParams, options?: UseQueryOptions<PaginatedResponse<Drug>>) {
+export function useDrugs(
+  params?: GetDrugsParams,
+  options?: UseQueryOptions<PaginatedResponse<Drug>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<Drug>>({
     queryKey: ['drugs', params],
@@ -288,14 +364,18 @@ export function useDrug(id: string, options?: UseQueryOptions<ApiResponse<Drug>>
 export function useSearchDrugs(query: string, options?: UseQueryOptions<ApiResponse<Drug[]>>) {
   return useQuery<ApiResponse<Drug[]>>({
     queryKey: ['drugs', 'search', query],
-    queryFn: () => fetchJson<ApiResponse<Drug[]>>(`/api/drugs/search?query=${encodeURIComponent(query)}`),
+    queryFn: () =>
+      fetchJson<ApiResponse<Drug[]>>(`/api/drugs/search?query=${encodeURIComponent(query)}`),
     enabled: query.length > 0,
     ...options,
   });
 }
 
 // ICD-10 hooks
-export function useICD10Codes(params?: GetICD10CodesParams, options?: UseQueryOptions<PaginatedResponse<ICD10Code>>) {
+export function useICD10Codes(
+  params?: GetICD10CodesParams,
+  options?: UseQueryOptions<PaginatedResponse<ICD10Code>>
+) {
   const queryString = new URLSearchParams(params as Record<string, string>).toString();
   return useQuery<PaginatedResponse<ICD10Code>>({
     queryKey: ['icd10', params],
@@ -313,10 +393,14 @@ export function useICD10Code(code: string, options?: UseQueryOptions<ApiResponse
   });
 }
 
-export function useSearchICD10Codes(query: string, options?: UseQueryOptions<ApiResponse<ICD10Code[]>>) {
+export function useSearchICD10Codes(
+  query: string,
+  options?: UseQueryOptions<ApiResponse<ICD10Code[]>>
+) {
   return useQuery<ApiResponse<ICD10Code[]>>({
     queryKey: ['icd10', 'search', query],
-    queryFn: () => fetchJson<ApiResponse<ICD10Code[]>>(`/api/icd10/search?query=${encodeURIComponent(query)}`),
+    queryFn: () =>
+      fetchJson<ApiResponse<ICD10Code[]>>(`/api/icd10/search?query=${encodeURIComponent(query)}`),
     enabled: query.length > 0,
     ...options,
   });

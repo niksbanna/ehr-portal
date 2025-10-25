@@ -2,7 +2,14 @@
  * ICD-10 Codes API Schema
  */
 
-import { ApiResponse, PaginatedResponse, Endpoint, PaginationParams, SortParams, FilterParams } from './common';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  Endpoint,
+  PaginationParams,
+  SortParams,
+  FilterParams,
+} from './common';
 
 // ICD-10 Code structure
 export interface ICD10Code {
