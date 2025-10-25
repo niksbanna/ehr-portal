@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Users, Calendar, FlaskConical, DollarSign } from 'lucide-react';
-import { api } from '../../services/api';
-import Layout from '../../components/layout/Layout';
+import { api } from '../services/api';
+import Layout from '../components/layout/Layout';
 import { format } from 'date-fns';
 
 const DashboardPage = () => {

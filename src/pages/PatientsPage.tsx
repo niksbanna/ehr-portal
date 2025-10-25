@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { Plus, Edit, Trash2, X } from 'lucide-react';
-import { api } from '../../services/api';
-import Layout from '../../components/layout/Layout';
-import { Patient } from '../../types/index';
+import { api } from '../services/api';
+import Layout from '../components/layout/Layout';
+import { Patient } from '../types/index';
 
 const PatientsPage = () => {
   const queryClient = useQueryClient();
