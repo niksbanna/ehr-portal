@@ -50,6 +50,7 @@ export interface Encounter {
     weight?: number;
     height?: number;
   };
+  soapNotes?: SOAPNote;
 }
 
 export interface LabResult {
@@ -121,4 +122,50 @@ export interface DashboardStats {
   totalRevenue: number;
   recentEncounters: Encounter[];
   recentPatients: Patient[];
+}
+
+// SOAP Notes for Encounter Form
+export interface SOAPNote {
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+}
+
+// Audit Log Entry
+export interface AuditLogEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  action: string;
+  resource: string;
+  resourceId: string;
+  timestamp: string;
+  details?: string;
+  ipAddress?: string;
+}
+
+// Settings
+export interface Settings {
+  userId: string;
+  theme: 'light' | 'dark' | 'system';
+  language: 'en' | 'hi';
+  notifications: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  };
+  dateFormat: 'DD-MM-YYYY' | 'MM-DD-YYYY' | 'YYYY-MM-DD';
+  timeFormat: '12h' | '24h';
+}
+
+// Offline Sync Queue
+export interface SyncQueueItem {
+  id: string;
+  type: 'encounter' | 'lab' | 'prescription' | 'bill';
+  action: 'create' | 'update' | 'delete';
+  data: unknown;
+  timestamp: string;
+  synced: boolean;
+  error?: string;
 }

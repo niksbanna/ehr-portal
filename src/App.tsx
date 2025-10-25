@@ -6,10 +6,15 @@ import { I18nProvider } from './contexts/I18nContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import PatientsPage from './pages/PatientsPage';
+import PatientSearchPage from './pages/PatientSearchPage';
+import PatientChartPage from './pages/PatientChartPage';
 import EncountersPage from './pages/EncountersPage';
 import LabsPage from './pages/LabsPage';
 import PrescriptionsPage from './pages/PrescriptionsPage';
 import BillingPage from './pages/BillingPage';
+import ReportsPage from './pages/ReportsPage';
+import SettingsPage from './pages/SettingsPage';
+import AuditLogPage from './pages/AuditLogPage';
 import { useGlobalShortcuts } from './hooks/useKeyboardShortcuts';
 
 const queryClient = new QueryClient({
@@ -49,6 +54,22 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/patient-search"
+        element={
+          <PrivateRoute>
+            <PatientSearchPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/patients/:patientId"
+        element={
+          <PrivateRoute>
+            <PatientChartPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
         path="/encounters"
         element={
           <PrivateRoute>
@@ -77,6 +98,30 @@ function AppRoutes() {
         element={
           <PrivateRoute>
             <BillingPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <PrivateRoute>
+            <ReportsPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <PrivateRoute>
+            <SettingsPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/audit-log"
+        element={
+          <PrivateRoute>
+            <AuditLogPage />
           </PrivateRoute>
         }
       />

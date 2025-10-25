@@ -10,7 +10,11 @@ import {
   Moon,
   Sun,
   Globe,
-  HelpCircle
+  HelpCircle,
+  Search,
+  BarChart,
+  Settings as SettingsIcon,
+  Shield
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
@@ -27,6 +31,10 @@ const iconMap = {
   FlaskConical,
   Pill,
   Receipt,
+  Search,
+  BarChart,
+  Settings: SettingsIcon,
+  Shield,
 };
 
 const Sidebar = () => {
