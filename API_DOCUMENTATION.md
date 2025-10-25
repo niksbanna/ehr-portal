@@ -67,12 +67,21 @@ Mock login system with 6 pre-configured users:
 
 ### Authentication
 
-```typescript
-POST /api/auth/login
-POST /api/auth/logout
-POST /api/auth/refresh
-GET  /api/auth/me
-```
+**POST /api/auth/login**
+- Request: `{ email: string, password: string }`
+- Response: `{ user: User, token: string, refreshToken: string, expiresIn: number }`
+
+**POST /api/auth/logout**
+- Request: `{ token: string }`
+- Response: `{ message: string }`
+
+**POST /api/auth/refresh**
+- Request: `{ refreshToken: string }`
+- Response: `{ token: string, expiresIn: number }`
+
+**GET /api/auth/me**
+- Headers: `Authorization: Bearer <token>`
+- Response: `{ user: User }`
 
 ### Patients
 
@@ -138,7 +147,7 @@ GET    /api/icd10/categories      // Get ICD-10 categories
 ### Example: Fetch Patients
 
 ```typescript
-import { usePatients } from '@/api/hooks';
+import { usePatients } from '../api/hooks';
 
 function PatientsList() {
   const { data, isLoading, error } = usePatients({ 
@@ -164,14 +173,35 @@ function PatientsList() {
 ### Example: Create Patient
 
 ```typescript
-import { useCreatePatient } from '@/api/hooks';
+import { useCreatePatient } from '../api/hooks';
+import { CreatePatientRequest } from '../api/schema';
 
 function CreatePatientForm() {
   const createPatient = useCreatePatient();
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = async (formData: CreatePatientRequest) => {
+    // Example patient data structure
+    const patientData: CreatePatientRequest = {
+      firstName: 'Arjun',
+      lastName: 'Verma',
+      dateOfBirth: '15-06-1990',
+      gender: 'male',
+      phone: '+919876543299',
+      email: 'arjun.verma@email.com',
+      aadhaar: '123456789876',
+      address: '45, Park Street',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400001',
+      emergencyContact: 'Sita Verma (Wife)',
+      emergencyPhone: '+919876543298',
+      bloodGroup: 'O+',
+      allergies: 'None',
+      medicalHistory: 'None'
+    };
+    
     try {
-      const result = await createPatient.mutateAsync(formData);
+      const result = await createPatient.mutateAsync(patientData);
       console.log('Patient created:', result.data);
     } catch (error) {
       console.error('Failed to create patient:', error);
@@ -189,7 +219,7 @@ function CreatePatientForm() {
 ### Example: Search Drugs
 
 ```typescript
-import { useSearchDrugs } from '@/api/hooks';
+import { useSearchDrugs } from '../api/hooks';
 
 function DrugSearch() {
   const [query, setQuery] = useState('');
@@ -261,7 +291,7 @@ Mock data is generated using realistic Indian hospital data:
 - **Names**: Common Indian first and last names
 - **Locations**: Major Indian cities and states
 - **Phone numbers**: +91 format
-- **Aadhaar**: Masked format (XXXX-XXXX-9012)
+- **Aadhaar**: Masked 12-digit format (XXXX-XXXX-XXXX)
 - **Medical data**: Realistic ICD-10 codes, vital signs, medications
 
 ## Development
@@ -275,7 +305,7 @@ async function enableMocking() {
   if (process.env.NODE_ENV !== 'development') {
     return
   }
-  // Comment out or remove these lines to disable MSW
+  // Comment out the lines below to disable MSW
   const { worker } = await import('./api/mocks/browser')
   return worker.start({ onUnhandledRequest: 'bypass' })
 }
