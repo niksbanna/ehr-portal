@@ -4,7 +4,7 @@ import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { format } from 'date-fns';
 import { formatINR } from '../schemas/fhir.schema';
-import { useI18n } from '../contexts/I18nContext';
+import { useI18n } from '../hooks/useI18n';
 import { SkeletonCard, SkeletonList } from '../components/common/Skeleton';
 
 const DashboardPage = () => {

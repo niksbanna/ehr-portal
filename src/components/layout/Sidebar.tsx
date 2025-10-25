@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useTheme } from '../../contexts/ThemeContext';
-import { useI18n } from '../../contexts/I18nContext';
+import { useTheme } from '../../hooks/useTheme';
+import { useI18n } from '../../hooks/useI18n';
 import { getNavigationItems } from '../../utils/permissions';
 import { useGlobalShortcuts } from '../../hooks/useKeyboardShortcuts';
 import KeyboardShortcutsModal from '../common/KeyboardShortcutsModal';

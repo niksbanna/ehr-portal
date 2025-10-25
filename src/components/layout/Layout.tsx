@@ -2,7 +2,7 @@ import { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 import PatientHeader from '../common/PatientHeader';
 import { Patient } from '../../types';
-import { useI18n } from '../../contexts/I18nContext';
+import { useI18n } from '../../hooks/useI18n';
 
 interface LayoutProps {
   children: ReactNode;
