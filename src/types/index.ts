@@ -1,8 +1,10 @@
+export type UserRole = 'admin' | 'doctor' | 'nurse' | 'lab_tech' | 'pharmacist' | 'billing';
+
 export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'doctor' | 'nurse' | 'receptionist';
+  role: UserRole;
 }
 
 export interface Patient {
