@@ -50,6 +50,7 @@ export interface Encounter {
     weight?: number;
     height?: number;
   };
+  soapNotes?: SOAPNote;
 }
 
 export interface LabResult {
