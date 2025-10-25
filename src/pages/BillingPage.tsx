@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
-import { format } from 'date-fns';
+import { formatINR } from '../schemas/fhir.schema';
 
 const BillingPage = () => {
   const { data: bills, isLoading } = useQuery({
@@ -51,7 +51,7 @@ const BillingPage = () => {
 
                 <div className="mb-4">
                   <p className="text-sm text-gray-600">Date</p>
-                  <p className="font-medium">{format(new Date(bill.date), 'PPp')}</p>
+                  <p className="font-medium">{bill.date}</p>
                 </div>
 
                 <div className="border-t border-b py-4 mb-4">
@@ -69,8 +69,8 @@ const BillingPage = () => {
                         <tr key={index} className="text-sm">
                           <td className="py-2">{item.description}</td>
                           <td className="py-2 text-right">{item.quantity}</td>
-                          <td className="py-2 text-right">₹{item.unitPrice.toLocaleString('en-IN')}</td>
-                          <td className="py-2 text-right font-medium">₹{item.total.toLocaleString('en-IN')}</td>
+                          <td className="py-2 text-right">{formatINR(item.unitPrice)}</td>
+                          <td className="py-2 text-right font-medium">{formatINR(item.total)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -80,21 +80,21 @@ const BillingPage = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">₹{bill.subtotal.toLocaleString('en-IN')}</span>
+                    <span className="font-medium">{formatINR(bill.subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Tax (18% GST)</span>
-                    <span className="font-medium">₹{bill.tax.toLocaleString('en-IN')}</span>
+                    <span className="font-medium">{formatINR(bill.tax)}</span>
                   </div>
                   {bill.discount > 0 && (
                     <div className="flex justify-between text-sm text-green-600">
                       <span>Discount</span>
-                      <span className="font-medium">-₹{bill.discount.toLocaleString('en-IN')}</span>
+                      <span className="font-medium">-{formatINR(bill.discount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
                     <span>Total</span>
-                    <span>₹{bill.total.toLocaleString('en-IN')}</span>
+                    <span>{formatINR(bill.total)}</span>
                   </div>
                 </div>
 
@@ -107,7 +107,7 @@ const BillingPage = () => {
                     <div className="flex justify-between text-sm mt-1">
                       <span className="text-gray-600">Amount Paid</span>
                       <span className="font-medium text-green-600">
-                        ₹{bill.paidAmount?.toLocaleString('en-IN')}
+                        {formatINR(bill.paidAmount || 0)}
                       </span>
                     </div>
                   </div>

@@ -3,6 +3,7 @@ import { Users, Calendar, FlaskConical, DollarSign } from 'lucide-react';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { format } from 'date-fns';
+import { formatINR } from '../schemas/fhir.schema';
 
 const DashboardPage = () => {
   const { data: stats, isLoading } = useQuery({
@@ -41,7 +42,7 @@ const DashboardPage = () => {
     },
     {
       title: 'Total Revenue',
-      value: `₹${stats?.totalRevenue.toLocaleString('en-IN') || 0}`,
+      value: formatINR(stats?.totalRevenue || 0),
       icon: DollarSign,
       color: 'bg-purple-500',
     },

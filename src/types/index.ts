@@ -9,20 +9,21 @@ export interface Patient {
   id: string;
   firstName: string;
   lastName: string;
-  dateOfBirth: string;
+  dateOfBirth: string; // DD-MM-YYYY format
   gender: 'male' | 'female' | 'other';
-  phone: string;
+  phone: string; // +91 format
   email: string;
+  aadhaar?: string; // 12-digit Aadhaar number (will be masked in display)
   address: string;
   city: string;
   state: string;
-  pincode: string;
+  pincode: string; // 6-digit Indian pincode
   emergencyContact: string;
-  emergencyPhone: string;
+  emergencyPhone: string; // +91 format
   bloodGroup?: string;
   allergies?: string;
   medicalHistory?: string;
-  registrationDate: string;
+  registrationDate: string; // DD-MM-YYYY format
 }
 
 export interface Encounter {
@@ -31,10 +32,11 @@ export interface Encounter {
   patientName: string;
   doctorId: string;
   doctorName: string;
-  date: string;
+  date: string; // ISO format for internal use
   type: 'consultation' | 'followup' | 'emergency';
   chiefComplaint: string;
   diagnosis: string;
+  diagnosisCode?: string; // ICD-10 code
   notes: string;
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';
   vitalSigns?: {
@@ -92,22 +94,22 @@ export interface Bill {
   patientId: string;
   patientName: string;
   encounterId?: string;
-  date: string;
+  date: string; // DD-MM-YYYY format
   items: BillItem[];
-  subtotal: number;
-  tax: number;
-  discount: number;
-  total: number;
+  subtotal: number; // in INR
+  tax: number; // in INR
+  discount: number; // in INR
+  total: number; // in INR
   status: 'pending' | 'paid' | 'partially-paid' | 'cancelled';
   paymentMethod?: string;
-  paidAmount?: number;
+  paidAmount?: number; // in INR
 }
 
 export interface BillItem {
   description: string;
   quantity: number;
-  unitPrice: number;
-  total: number;
+  unitPrice: number; // in INR
+  total: number; // in INR
 }
 
 export interface DashboardStats {
