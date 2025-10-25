@@ -35,10 +35,14 @@ export const translations = {
     nav: {
       dashboard: 'Dashboard',
       patients: 'Patients',
+      patientSearch: 'Patient Search',
       encounters: 'Encounters',
       labs: 'Lab Results',
       prescriptions: 'Prescriptions',
       billing: 'Billing',
+      reports: 'Reports',
+      settings: 'Settings',
+      auditLog: 'Audit Log',
     },
     dashboard: {
       title: 'Dashboard',
