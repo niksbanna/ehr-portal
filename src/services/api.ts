@@ -1,12 +1,44 @@
 import { Patient, Encounter, LabResult, Prescription, Bill, DashboardStats, User } from '../types/index';
 
-// Mock user data
-const mockUser: User = {
-  id: '1',
-  email: 'admin@hospital.in',
-  name: 'Dr. Rajesh Kumar',
-  role: 'doctor',
-};
+// Mock user data with different roles
+const mockUsers: User[] = [
+  {
+    id: '1',
+    email: 'admin@hospital.in',
+    name: 'Dr. Rajesh Kumar',
+    role: 'admin',
+  },
+  {
+    id: '2',
+    email: 'doctor@hospital.in',
+    name: 'Dr. Priya Sharma',
+    role: 'doctor',
+  },
+  {
+    id: '3',
+    email: 'nurse@hospital.in',
+    name: 'Nurse Anjali Singh',
+    role: 'nurse',
+  },
+  {
+    id: '4',
+    email: 'lab@hospital.in',
+    name: 'Lab Tech Ramesh Patel',
+    role: 'lab_tech',
+  },
+  {
+    id: '5',
+    email: 'pharmacist@hospital.in',
+    name: 'Pharmacist Sunil Kumar',
+    role: 'pharmacist',
+  },
+  {
+    id: '6',
+    email: 'billing@hospital.in',
+    name: 'Billing Staff Meera Joshi',
+    role: 'billing',
+  },
+];
 
 // Seeded patient data with realistic Indian hospital data
 const mockPatients: Patient[] = [
@@ -437,23 +469,40 @@ const mockBills: Bill[] = [
 // Mock API class
 class MockAPI {
   private delay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
+  private currentUser: User | null = null;
 
   // Authentication
   async login(email: string, password: string): Promise<User> {
     await this.delay();
     if (email && password) {
-      return mockUser;
+      // Find user by email or use default admin
+      const user = mockUsers.find(u => u.email === email) || mockUsers[0];
+      this.currentUser = user;
+      localStorage.setItem('current_user', JSON.stringify(user));
+      return user;
     }
     throw new Error('Invalid credentials');
   }
 
   async logout(): Promise<void> {
     await this.delay();
+    this.currentUser = null;
+    localStorage.removeItem('current_user');
   }
 
   getCurrentUser(): User | null {
     const token = localStorage.getItem('auth_token');
-    return token ? mockUser : null;
+    if (!token) return null;
+    
+    if (this.currentUser) return this.currentUser;
+    
+    const savedUser = localStorage.getItem('current_user');
+    if (savedUser) {
+      this.currentUser = JSON.parse(savedUser);
+      return this.currentUser;
+    }
+    
+    return mockUsers[0]; // Default to admin
   }
 
   // Patients
