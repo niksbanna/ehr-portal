@@ -61,18 +61,27 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 
 ### Frontend Setup
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/niksbanna/ehr-portal.git
 cd ehr-portal
 ```
 
-2. Install dependencies:
+2. **Install dependencies:**
+
 ```bash
 npm install
 ```
 
-3. Start the development server:
+3. **Set up environment variables:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` file to configure your environment (see [Environment Variables](#environment-variables) section).
+
+4. **Start the development server:**
+
 ```bash
 npm run dev
 ```
@@ -123,14 +132,69 @@ npm run build
 npm run start:prod
 ```
 
-The build output will be in the `dist` directory.
+The production build will be in the `dist/` directory.
 
-### Running the Production Build
+3. **Preview the build locally:**
 
 **Frontend:**
 ```bash
 npm run preview
 ```
+
+### Docker Deployment
+
+#### Using Docker Compose (Recommended)
+
+```bash
+# Build and start
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+Access the application at `http://localhost:3000`
+
+#### Using Docker CLI
+
+```bash
+# Build image
+docker build -t ehr-portal:latest .
+
+# Run container
+docker run -d -p 3000:80 --name ehr-portal ehr-portal:latest
+
+# Check health
+curl http://localhost:3000/health
+```
+
+### Deployment Platforms
+
+#### Netlify
+
+```bash
+npm run build
+netlify deploy --prod --dir=dist
+```
+
+#### Vercel
+
+```bash
+vercel --prod
+```
+
+#### AWS / GCP / Azure
+
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed cloud deployment instructions.
+
+For comprehensive deployment guides, see:
+
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Docker Setup Guide](./docs/DOCKER.md)
+- [Environment Configuration](./docs/ENVIRONMENT.md)
 
 ## Demo Credentials
 
@@ -156,25 +220,95 @@ The backend database comes with pre-seeded data including:
 
 ### Frontend
 ```
-src/
-├── components/          # Reusable UI components
-│   └── layout/         # Layout components (Sidebar, Layout)
-├── pages/              # Page components
-│   ├── LoginPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── PatientsPage.tsx
-│   ├── EncountersPage.tsx
-│   ├── LabsPage.tsx
-│   ├── PrescriptionsPage.tsx
-│   └── BillingPage.tsx
-├── services/           # API and business logic
-│   └── api.ts         # Mock API with seeded data
-├── hooks/              # Custom React hooks
-│   └── useAuth.tsx    # Authentication hook
-├── types/              # TypeScript type definitions
-│   └── index.ts
-├── App.tsx             # Main application component
-└── main.tsx            # Application entry point
+ehr-portal/
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI/CD
+├── docs/                       # Documentation
+│   ├── README.md
+│   ├── SETUP.md
+│   ├── ARCHITECTURE.md
+│   ├── DEPLOYMENT.md
+│   ├── ENVIRONMENT.md
+│   ├── DOCKER.md
+│   └── CONTRIBUTING.md
+├── e2e/                        # End-to-end tests
+│   └── app.spec.ts
+├── public/                     # Public static assets
+│   ├── manifest.json
+│   └── mockServiceWorker.js
+├── src/
+│   ├── api/                    # API client and schemas
+│   │   ├── hooks/             # React Query hooks
+│   │   ├── mocks/             # Mock Service Worker handlers
+│   │   ├── schema/            # API type definitions
+│   │   └── index.ts
+│   ├── assets/                 # Static assets
+│   ├── components/             # Reusable UI components
+│   │   ├── common/            # Common components (Button, Input, etc.)
+│   │   └── layout/            # Layout components (Sidebar, Layout)
+│   ├── contexts/               # React contexts
+│   │   ├── ThemeContext.tsx
+│   │   └── I18nContext.tsx
+│   ├── data/                   # Static data
+│   │   └── icd10-codes.json
+│   ├── hooks/                  # Custom React hooks
+│   │   ├── useAuth.tsx
+│   │   ├── useTheme.ts
+│   │   └── useI18n.ts
+│   ├── i18n/                   # Internationalization
+│   │   └── translations.ts
+│   ├── mocks/                  # Symlink to api/mocks
+│   ├── pages/                  # Page components
+│   │   ├── LoginPage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   ├── PatientsPage.tsx
+│   │   ├── EncountersPage.tsx
+│   │   ├── LabsPage.tsx
+│   │   ├── PrescriptionsPage.tsx
+│   │   └── BillingPage.tsx
+│   ├── routes/                 # Route configuration
+│   │   └── index.tsx
+│   ├── schemas/                # Validation schemas
+│   │   ├── fhir.schema.ts
+│   │   └── patient-form.schema.ts
+│   ├── services/               # Business logic services
+│   │   ├── api.ts
+│   │   └── auditLogger.ts
+│   ├── stores/                 # State management stores
+│   │   └── index.ts
+│   ├── test/                   # Unit tests
+│   │   ├── setup.ts
+│   │   └── *.test.tsx
+│   ├── tests/                  # Symlink to test
+│   ├── types/                  # TypeScript type definitions
+│   │   └── index.ts
+│   ├── utils/                  # Utility functions
+│   │   ├── sanitize.ts
+│   │   ├── permissions.ts
+│   │   └── accessibility.ts
+│   ├── App.tsx                 # Main application component
+│   ├── main.tsx                # Application entry point
+│   └── index.css               # Global styles
+├── .env.example                # Example environment variables
+├── .eslintrc                   # ESLint configuration (legacy)
+├── .gitignore
+├── .prettierrc
+├── docker-compose.yml          # Docker Compose configuration
+├── Dockerfile                  # Docker build configuration
+├── eslint.config.js            # ESLint configuration (modern)
+├── nginx.conf                  # Nginx configuration for Docker
+├── package.json
+├── playwright.config.ts        # Playwright E2E test configuration
+├── postcss.config.js           # PostCSS configuration
+├── README.md
+├── tailwind.config.cjs         # Tailwind CSS configuration (CommonJS)
+├── tailwind.config.js          # Tailwind CSS configuration (ES Module)
+├── tsconfig.json               # TypeScript configuration
+├── tsconfig.app.json           # TypeScript app configuration
+├── tsconfig.node.json          # TypeScript Node configuration
+├── vite.config.ts              # Vite configuration
+└── vitest.config.ts            # Vitest test configuration
 ```
 
 ### Backend
@@ -231,6 +365,96 @@ A complete NestJS backend with PostgreSQL database is available in the `/backend
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+- `npm run lint:fix` - Fix ESLint issues
+- `npm run format` - Format code with Prettier
+- `npm run format:check` - Check formatting
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run test:coverage` - Generate coverage report
+- `npm run test:e2e` - Run E2E tests
+
+### Code Quality
+
+This project uses:
+
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **Husky** for pre-commit hooks
+- **TypeScript** for type safety
+- **Vitest** for unit testing
+- **Playwright** for E2E testing
+
+Pre-commit hooks automatically run linting and formatting on staged files.
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+
+- **[Setup Guide](./docs/SETUP.md)** - Detailed setup instructions
+- **[Architecture Guide](./docs/ARCHITECTURE.md)** - System architecture and design patterns
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Production deployment instructions
+- **[Environment Configuration](./docs/ENVIRONMENT.md)** - Environment variables reference
+- **[Docker Setup](./docs/DOCKER.md)** - Docker and Docker Compose guide
+- **[Contributing Guide](./docs/CONTRIBUTING.md)** - How to contribute
+- **[API Documentation](./API_DOCUMENTATION.md)** - API endpoints and usage
+- **[FHIR Implementation](./FHIR_IMPLEMENTATION.md)** - FHIR compliance details
+- **[Security & Accessibility](./SECURITY_ACCESSIBILITY.md)** - Security and accessibility features
+- **[Performance Guide](./PERFORMANCE.md)** - Performance optimization
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](./docs/CONTRIBUTING.md) for details on:
+
+- Code of conduct
+- Development process
+- Coding standards
+- Testing requirements
+- Pull request process
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration:
+
+### Workflows
+
+- **Lint**: ESLint and Prettier checks
+- **Test**: Unit and integration tests with coverage
+- **Build**: Production build verification
+- **E2E**: End-to-end testing with Playwright
+- **Docker**: Docker image build and test
+
+All checks must pass before merging pull requests.
+
+## Configuration Files
+
+### Build & Development
+
+- `vite.config.ts` - Vite configuration (build tool)
+- `tsconfig.json` - TypeScript configuration
+- `tailwind.config.cjs` - Tailwind CSS configuration
+- `postcss.config.js` - PostCSS configuration
+
+### Code Quality
+
+- `eslint.config.js` - ESLint configuration (modern flat config)
+- `.eslintrc` - ESLint configuration (legacy format)
+- `.prettierrc` - Prettier configuration
+
+### Testing
+
+- `vitest.config.ts` - Vitest unit test configuration
+- `playwright.config.ts` - Playwright E2E test configuration
+
+### Docker
+
+- `Dockerfile` - Docker image build configuration
+- `docker-compose.yml` - Docker Compose orchestration
+- `nginx.conf` - Nginx server configuration
+
+### Environment
+
+- `.env.example` - Example environment variables template
+- `.env` - Local environment variables (not committed)
 
 **Backend:**
 - `cd backend && npm run start:dev` - Start backend in dev mode
@@ -247,15 +471,19 @@ A complete NestJS backend with PostgreSQL database is available in the `/backend
 ## Screenshots
 
 ### Login Page
+
 ![Login](https://github.com/user-attachments/assets/5fa10008-da4c-4a9d-be89-40e0a2681a31)
 
 ### Dashboard
+
 ![Dashboard](https://github.com/user-attachments/assets/05dcb68f-322c-4c13-998f-29d11601ef02)
 
 ### Patients Registry
+
 ![Patients](https://github.com/user-attachments/assets/cbcafaf4-c43f-42e5-a043-65852fb956b0)
 
 ### Billing
+
 ![Billing](https://github.com/user-attachments/assets/ff74b147-b18b-4876-8b28-d41bd083b7da)
 
 ## License
