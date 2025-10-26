@@ -32,3 +32,8 @@ test-results
 # PWA
 dev-dist
 
+# Backend
+backend/.env
+backend/dist
+backend/node_modules
+
