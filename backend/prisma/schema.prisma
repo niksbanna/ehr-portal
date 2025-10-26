@@ -1,0 +1,196 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(DOCTOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  encounters    Encounter[]
+  prescriptions Prescription[]
+  labResults    LabResult[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  DOCTOR
+  NURSE
+  LAB_TECH
+  PHARMACIST
+  BILLING
+}
+
+model Patient {
+  id                String   @id @default(uuid())
+  firstName         String
+  lastName          String
+  dateOfBirth       String
+  gender            Gender
+  phone             String
+  email             String
+  aadhaar           String?
+  address           String
+  city              String
+  state             String
+  pincode           String
+  emergencyContact  String
+  emergencyPhone    String
+  bloodGroup        String?
+  allergies         String?
+  medicalHistory    String?
+  registrationDate  String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  encounters    Encounter[]
+  labResults    LabResult[]
+  prescriptions Prescription[]
+  bills         Bill[]
+
+  @@map("patients")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Encounter {
+  id              String          @id @default(uuid())
+  patientId       String
+  patient         Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId        String
+  doctor          User            @relation(fields: [doctorId], references: [id])
+  date            DateTime
+  type            EncounterType
+  chiefComplaint  String
+  diagnosis       String
+  diagnosisCode   String?
+  notes           String
+  status          EncounterStatus @default(SCHEDULED)
+  vitalSigns      Json?
+  soapNotes       Json?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  labResults    LabResult[]
+  prescriptions Prescription[]
+  bills         Bill[]
+
+  @@map("encounters")
+}
+
+enum EncounterType {
+  CONSULTATION
+  FOLLOWUP
+  EMERGENCY
+}
+
+enum EncounterStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model LabResult {
+  id           String         @id @default(uuid())
+  patientId    String
+  patient      Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  encounterId  String?
+  encounter    Encounter?     @relation(fields: [encounterId], references: [id])
+  testName     String
+  testCategory String
+  orderedDate  DateTime
+  reportDate   DateTime?
+  status       LabStatus      @default(PENDING)
+  results      String?
+  normalRange  String?
+  unit         String?
+  remarks      String?
+  orderedById  String
+  orderedBy    User           @relation(fields: [orderedById], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@map("lab_results")
+}
+
+enum LabStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Prescription {
+  id           String             @id @default(uuid())
+  patientId    String
+  patient      Patient            @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  encounterId  String
+  encounter    Encounter          @relation(fields: [encounterId], references: [id])
+  doctorId     String
+  doctor       User               @relation(fields: [doctorId], references: [id])
+  date         DateTime
+  medications  Json
+  instructions String?
+  status       PrescriptionStatus @default(ACTIVE)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@map("prescriptions")
+}
+
+enum PrescriptionStatus {
+  ACTIVE
+  COMPLETED
+  DISCONTINUED
+}
+
+model Bill {
+  id            String        @id @default(uuid())
+  patientId     String
+  patient       Patient       @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  encounterId   String?
+  encounter     Encounter?    @relation(fields: [encounterId], references: [id])
+  date          DateTime
+  items         Json
+  subtotal      Float
+  tax           Float
+  discount      Float         @default(0)
+  total         Float
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@map("bills")
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  UPI
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CANCELLED
+}

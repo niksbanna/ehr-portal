@@ -1,0 +1,48 @@
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  // Enable CORS
+  app.enableCors({
+    origin: configService.get('cors.origin'),
+    credentials: true,
+  });
+
+  // Global validation pipe
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
+  // API prefix
+  app.setGlobalPrefix('api');
+
+  // Swagger setup
+  if (configService.get('swagger.enabled') !== false) {
+    const config = new DocumentBuilder()
+      .setTitle(configService.get('swagger.title'))
+      .setDescription(configService.get('swagger.description'))
+      .setVersion(configService.get('swagger.version'))
+      .addBearerAuth()
+      .build();
+
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(configService.get('swagger.path'), app, document);
+  }
+
+  const port = configService.get('port');
+  await app.listen(port);
+  console.log(`Application is running on: http://localhost:${port}`);
+  console.log(`Swagger documentation: http://localhost:${port}/${configService.get('swagger.path')}`);
+}
+
+bootstrap();

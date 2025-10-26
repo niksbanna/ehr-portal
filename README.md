@@ -33,7 +33,8 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 
 ## Tech Stack
 
-- **Frontend Framework**: React 19 with TypeScript
+### Frontend
+- **Framework**: React 19 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS 3
 - **Routing**: React Router v7
@@ -42,18 +43,23 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 - **Icons**: Lucide React
 - **Date Handling**: date-fns
 
+### Backend
+- **Framework**: NestJS 10 with TypeScript
+- **Database**: PostgreSQL 16
+- **ORM**: Prisma 5
+- **Authentication**: JWT with Passport
+- **Documentation**: Swagger/OpenAPI
+- **Container**: Docker & Docker Compose
+
 ## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 18 or higher
-- **npm** 9 or higher (comes with Node.js)
-- **Docker** (optional, for containerized deployment)
-- **Git** for version control
+- Node.js 18+ 
+- npm or yarn
+- PostgreSQL 16+ (for backend, or use Docker)
 
-### Quick Start
-
-1. **Clone the repository:**
+### Frontend Setup
 
 ```bash
 git clone https://github.com/niksbanna/ehr-portal.git
@@ -82,89 +88,55 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
-### Available Scripts
+### Backend Setup
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build locally
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
-- `npm run test` - Run unit tests in watch mode
-- `npm run test:run` - Run unit tests once
-- `npm run test:coverage` - Generate test coverage report
-- `npm run test:e2e` - Run end-to-end tests
+See the detailed [Backend Integration Guide](BACKEND_INTEGRATION.md) for complete setup instructions.
 
-## Environment Variables
+**Quick Start:**
 
-The application uses environment variables for configuration. Copy `.env.example` to `.env` and configure as needed.
-
-### Core Configuration
-
+1. Navigate to backend directory:
 ```bash
-# Application
-VITE_APP_NAME=EHR Portal
-VITE_APP_VERSION=0.0.0
-
-# API Configuration
-VITE_API_BASE_URL=http://localhost:3000/api
-VITE_API_TIMEOUT=30000
-
-# Mock Service Worker (for development)
-VITE_ENABLE_MSW=true  # Set to 'false' to use real API
-
-# Authentication
-VITE_AUTH_TOKEN_KEY=ehr_auth_token
-VITE_AUTH_SESSION_TIMEOUT=3600000  # 1 hour in milliseconds
+cd backend
 ```
 
-### Optional Configuration
-
+2. Install dependencies:
 ```bash
-# FHIR Server (when using real API)
-VITE_FHIR_SERVER_URL=https://fhir.example.com/api
-VITE_FHIR_VERSION=4.0.1
-
-# Feature Flags
-VITE_ENABLE_PWA=true
-VITE_ENABLE_ANALYTICS=false
-VITE_ENABLE_OFFLINE_MODE=true
-
-# Internationalization
-VITE_DEFAULT_LANGUAGE=en
-VITE_SUPPORTED_LANGUAGES=en,hi
-
-# Theme
-VITE_DEFAULT_THEME=light
-
-# Logging
-VITE_LOG_LEVEL=info
-VITE_ENABLE_AUDIT_LOG=true
+npm install
 ```
 
-For a complete list of environment variables, see [docs/ENVIRONMENT.md](./docs/ENVIRONMENT.md).
+3. Start with Docker (PostgreSQL + Backend):
+```bash
+docker-compose up -d
+```
 
-## Deployment
+4. Run migrations and seed:
+```bash
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+The backend API will be available at `http://localhost:3000`
+API Documentation (Swagger): `http://localhost:3000/api/docs`
 
 ### Building for Production
 
-1. **Install dependencies:**
-
-```bash
-npm ci
-```
-
-2. **Build the application:**
-
+**Frontend:**
 ```bash
 npm run build
+```
+
+**Backend:**
+```bash
+cd backend
+npm run build
+npm run start:prod
 ```
 
 The production build will be in the `dist/` directory.
 
 3. **Preview the build locally:**
 
+**Frontend:**
 ```bash
 npm run preview
 ```
@@ -226,21 +198,27 @@ For comprehensive deployment guides, see:
 
 ## Demo Credentials
 
+### Frontend (Mock API)
 - **Email**: admin@hospital.in
-- **Password**: any password (authentication is mocked)
+- **Password**: any password (authentication is mocked in frontend-only mode)
+
+### Backend API
+- **Email**: admin@hospital.in, doctor@hospital.in, or nurse@hospital.in
+- **Password**: password123
 
 ## Seeded Data
 
-The application comes with pre-seeded mock data including:
-
-- 3 patients with complete medical records
-- 3 encounters (patient visits)
-- 3 lab results
-- 2 prescriptions
-- 3 billing records
+The backend database comes with pre-seeded data including:
+- 3 users (admin, doctor, nurse)
+- 2 patients with complete medical records
+- 1 encounter
+- 1 lab result
+- 1 prescription
+- 1 billing record
 
 ## Project Structure
 
+### Frontend
 ```
 ehr-portal/
 ├── .github/
@@ -333,17 +311,31 @@ ehr-portal/
 └── vitest.config.ts            # Vitest test configuration
 ```
 
-### Directory Descriptions
+### Backend
+```
+backend/
+├── src/
+│   ├── modules/          # Feature modules
+│   │   ├── auth/         # Authentication (JWT)
+│   │   ├── patients/     # Patient management
+│   │   ├── encounters/   # Medical encounters
+│   │   ├── labs/         # Lab results
+│   │   ├── prescriptions/# Prescriptions
+│   │   ├── billing/      # Billing & payments
+│   │   └── reports/      # Reports & analytics
+│   ├── common/           # Shared services (Prisma)
+│   ├── config/           # Configuration
+│   ├── app.module.ts     # Root module
+│   └── main.ts           # Entry point
+├── prisma/
+│   ├── schema.prisma     # Database schema
+│   └── seed.ts           # Database seeder
+├── .env.example          # Environment template
+├── docker-compose.yml    # Docker setup
+└── Dockerfile            # Container config
+```
 
-- **`src/components/`**: Reusable UI components organized by category
-- **`src/pages/`**: Top-level page components mapped to routes
-- **`src/hooks/`**: Custom React hooks for shared logic
-- **`src/api/`**: API client, types, and mock data
-- **`src/routes/`**: Application routing configuration
-- **`src/stores/`**: State management stores and contexts
-- **`src/mocks/`**: Mock data and MSW handlers
-- **`src/tests/`**: Unit and integration tests
-- **`docs/`**: Comprehensive project documentation
+See [Backend README](backend/README.md) and [Backend Integration Guide](BACKEND_INTEGRATION.md) for more details.
 
 ## Indian Hospital Specific Features
 
@@ -354,14 +346,21 @@ ehr-portal/
 - **Blood Groups**: Common Indian blood group tracking
 - **Payment Methods**: UPI, Card, and Cash options
 
-## Mock API
+## API Options
 
-The application uses a mock API with simulated delays to mimic real-world API behavior. All data is stored in memory and resets on page refresh.
+The application supports two modes:
+
+### 1. Mock API (Default)
+The frontend includes a mock API with simulated delays to mimic real-world API behavior. All data is stored in memory and resets on page refresh. Perfect for frontend development and testing.
+
+### 2. Backend API
+A complete NestJS backend with PostgreSQL database is available in the `/backend` directory. See [Backend Integration Guide](BACKEND_INTEGRATION.md) for setup instructions.
 
 ## Development
 
 ### Available Scripts
 
+**Frontend:**
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
@@ -456,6 +455,11 @@ All checks must pass before merging pull requests.
 
 - `.env.example` - Example environment variables template
 - `.env` - Local environment variables (not committed)
+
+**Backend:**
+- `cd backend && npm run start:dev` - Start backend in dev mode
+- `cd backend && npm run build` - Build backend
+- `cd backend && npm run prisma:studio` - Open Prisma Studio
 
 ## Browser Support
 
