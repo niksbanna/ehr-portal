@@ -201,10 +201,14 @@ export const translations = {
     nav: {
       dashboard: 'डैशबोर्ड',
       patients: 'मरीज़',
+      patientSearch: 'मरीज़ खोज',
       encounters: 'मुलाकातें',
       labs: 'लैब रिपोर्ट',
       prescriptions: 'नुस्खे',
       billing: 'बिलिंग',
+      reports: 'रिपोर्ट',
+      settings: 'सेटिंग्स',
+      auditLog: 'ऑडिट लॉग',
     },
     dashboard: {
       title: 'डैशबोर्ड',

@@ -30,6 +30,17 @@ A comprehensive Electronic Health Records (EHR) web application built with React
   - Tax calculations (18% GST)
   - Multiple payment methods (UPI, Card, Cash)
   - Payment status tracking
+- **Reports & Analytics**: Visual data representation with charts
+  - Revenue distribution (Pie chart)
+  - Patient gender distribution (Pie chart)
+  - Encounter status distribution (Bar chart)
+  - Lab test status distribution (Bar chart)
+  - Date range filtering for reports
+  - Export functionality for all reports
+- **Internationalization**: Complete Hindi and English language support
+  - Real-time language toggle
+  - All UI elements translated
+  - Seamless language switching
 
 ## Tech Stack
 
@@ -221,94 +232,109 @@ The backend database comes with pre-seeded data including:
 ### Frontend
 ```
 ehr-portal/
-├── .github/
-│   └── workflows/
-│       └── ci.yml              # GitHub Actions CI/CD
-├── docs/                       # Documentation
-│   ├── README.md
-│   ├── SETUP.md
-│   ├── ARCHITECTURE.md
-│   ├── DEPLOYMENT.md
-│   ├── ENVIRONMENT.md
-│   ├── DOCKER.md
-│   └── CONTRIBUTING.md
-├── e2e/                        # End-to-end tests
-│   └── app.spec.ts
-├── public/                     # Public static assets
-│   ├── manifest.json
-│   └── mockServiceWorker.js
-├── src/
-│   ├── api/                    # API client and schemas
-│   │   ├── hooks/             # React Query hooks
-│   │   ├── mocks/             # Mock Service Worker handlers
-│   │   ├── schema/            # API type definitions
-│   │   └── index.ts
-│   ├── assets/                 # Static assets
-│   ├── components/             # Reusable UI components
-│   │   ├── common/            # Common components (Button, Input, etc.)
-│   │   └── layout/            # Layout components (Sidebar, Layout)
-│   ├── contexts/               # React contexts
-│   │   ├── ThemeContext.tsx
-│   │   └── I18nContext.tsx
-│   ├── data/                   # Static data
-│   │   └── icd10-codes.json
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── useAuth.tsx
-│   │   ├── useTheme.ts
-│   │   └── useI18n.ts
-│   ├── i18n/                   # Internationalization
-│   │   └── translations.ts
-│   ├── mocks/                  # Symlink to api/mocks
-│   ├── pages/                  # Page components
-│   │   ├── LoginPage.tsx
-│   │   ├── DashboardPage.tsx
-│   │   ├── PatientsPage.tsx
-│   │   ├── EncountersPage.tsx
-│   │   ├── LabsPage.tsx
-│   │   ├── PrescriptionsPage.tsx
-│   │   └── BillingPage.tsx
-│   ├── routes/                 # Route configuration
-│   │   └── index.tsx
-│   ├── schemas/                # Validation schemas
-│   │   ├── fhir.schema.ts
-│   │   └── patient-form.schema.ts
-│   ├── services/               # Business logic services
-│   │   ├── api.ts
-│   │   └── auditLogger.ts
-│   ├── stores/                 # State management stores
-│   │   └── index.ts
-│   ├── test/                   # Unit tests
-│   │   ├── setup.ts
-│   │   └── *.test.tsx
-│   ├── tests/                  # Symlink to test
-│   ├── types/                  # TypeScript type definitions
-│   │   └── index.ts
-│   ├── utils/                  # Utility functions
-│   │   ├── sanitize.ts
-│   │   ├── permissions.ts
-│   │   └── accessibility.ts
-│   ├── App.tsx                 # Main application component
-│   ├── main.tsx                # Application entry point
-│   └── index.css               # Global styles
-├── .env.example                # Example environment variables
-├── .eslintrc                   # ESLint configuration (legacy)
-├── .gitignore
-├── .prettierrc
-├── docker-compose.yml          # Docker Compose configuration
-├── Dockerfile                  # Docker build configuration
-├── eslint.config.js            # ESLint configuration (modern)
-├── nginx.conf                  # Nginx configuration for Docker
-├── package.json
-├── playwright.config.ts        # Playwright E2E test configuration
-├── postcss.config.js           # PostCSS configuration
-├── README.md
-├── tailwind.config.cjs         # Tailwind CSS configuration (CommonJS)
-├── tailwind.config.js          # Tailwind CSS configuration (ES Module)
-├── tsconfig.json               # TypeScript configuration
-├── tsconfig.app.json           # TypeScript app configuration
-├── tsconfig.node.json          # TypeScript Node configuration
-├── vite.config.ts              # Vite configuration
-└── vitest.config.ts            # Vitest test configuration
+├── API_DOCUMENTATION.md          # API endpoints documentation
+├── Dockerfile                    # Docker build configuration
+├── FHIR_IMPLEMENTATION.md        # FHIR compliance details
+├── IMPLEMENTATION_SUMMARY.md     # Implementation summary
+├── PERFORMANCE.md                # Performance optimization guide
+├── README.md                     # This file
+├── SECURITY_ACCESSIBILITY.md     # Security & accessibility features
+├── docker-compose.yml            # Docker Compose orchestration
+├── docs/                         # Comprehensive documentation
+│   ├── ARCHITECTURE.md           # System architecture
+│   ├── CONTRIBUTING.md           # Contributing guidelines
+│   ├── DEPLOYMENT.md             # Deployment instructions
+│   ├── DOCKER.md                 # Docker setup guide
+│   ├── ENVIRONMENT.md            # Environment variables reference
+│   ├── README.md                 # Documentation index
+│   └── SETUP.md                  # Setup guide
+├── e2e/                          # End-to-end tests
+│   └── app.spec.ts               # E2E test suite
+├── eslint.config.js              # ESLint configuration (modern)
+├── index.html                    # HTML entry point
+├── nginx.conf                    # Nginx server configuration
+├── package-lock.json             # NPM lock file
+├── package.json                  # NPM dependencies & scripts
+├── playwright.config.ts          # Playwright E2E configuration
+├── postcss.config.js             # PostCSS configuration
+├── public/                       # Public static assets
+│   ├── manifest.json             # PWA manifest
+│   ├── mockServiceWorker.js      # MSW service worker
+│   └── vite.svg                  # Vite logo
+├── src/                          # Source code
+│   ├── App.tsx                   # Main application component
+│   ├── api/                      # API client and mocks
+│   │   ├── hooks/                # React Query custom hooks
+│   │   ├── index.ts              # API exports
+│   │   ├── mocks/                # Mock Service Worker handlers
+│   │   └── schema/               # API type definitions
+│   ├── assets/                   # Static assets
+│   │   └── react.svg             # React logo
+│   ├── components/               # Reusable UI components
+│   │   ├── PageSkeleton.tsx      # Loading skeleton
+│   │   ├── common/               # Common components
+│   │   └── layout/               # Layout components
+│   ├── contexts/                 # React contexts
+│   │   ├── I18nContext.tsx       # Internationalization context
+│   │   └── ThemeContext.tsx      # Theme management context
+│   ├── data/                     # Static data
+│   │   └── icd10-codes.json      # ICD-10 diagnosis codes
+│   ├── hooks/                    # Custom React hooks
+│   │   ├── useAuth.tsx           # Authentication hook
+│   │   ├── useI18n.ts            # i18n hook
+│   │   ├── useKeyboardShortcuts.ts  # Keyboard shortcuts hook
+│   │   ├── useOptimisticUpdate.ts   # Optimistic update hook
+│   │   └── useTheme.ts           # Theme hook
+│   ├── i18n/                     # Internationalization
+│   │   └── translations.ts       # English & Hindi translations
+│   ├── index.css                 # Global styles
+│   ├── main.tsx                  # Application entry point
+│   ├── mocks -> api/mocks        # Symlink to API mocks
+│   ├── pages/                    # Page components
+│   │   ├── AuditLogPage.tsx      # Audit log page
+│   │   ├── BillingPage.tsx       # Billing & invoices page
+│   │   ├── DashboardPage.tsx     # Dashboard page
+│   │   ├── EncountersPage.tsx    # Patient encounters page
+│   │   ├── LabsPage.tsx          # Lab results page
+│   │   ├── LoginPage.tsx         # Login page
+│   │   ├── PatientChartPage.tsx  # Patient chart page
+│   │   ├── PatientSearchPage.tsx # Patient search page
+│   │   ├── PatientsPage.tsx      # Patient registry page
+│   │   ├── PrescriptionsPage.tsx # Prescriptions page
+│   │   ├── ReportsPage.tsx       # Reports & charts page
+│   │   └── SettingsPage.tsx      # Settings page
+│   ├── routes/                   # Route configuration
+│   │   └── index.tsx             # Routes definition
+│   ├── schemas/                  # Validation schemas
+│   │   ├── fhir.schema.ts        # FHIR resource schemas
+│   │   └── patient-form.schema.ts # Patient form validation
+│   ├── services/                 # Business logic services
+│   │   ├── api.ts                # API service layer
+│   │   └── auditLogger.ts        # Audit logging service
+│   ├── stores/                   # State management
+│   │   └── index.ts              # Store exports
+│   ├── test/                     # Unit tests
+│   │   ├── App.test.tsx          # App component tests
+│   │   ├── PageSkeleton.test.tsx # Skeleton tests
+│   │   ├── auditLogger.test.ts   # Audit logger tests
+│   │   ├── sanitize.test.ts      # Sanitization tests
+│   │   ├── setup.ts              # Test setup
+│   │   └── useOptimisticUpdate.test.tsx # Hook tests
+│   ├── tests -> test             # Symlink to test
+│   ├── types/                    # TypeScript type definitions
+│   │   └── index.ts              # Type exports
+│   └── utils/                    # Utility functions
+│       ├── accessibility.ts      # Accessibility helpers
+│       ├── duplicate-detection.ts # Duplicate detection
+│       ├── permissions.ts        # Permission checks
+│       └── sanitize.ts           # Input sanitization
+├── tailwind.config.cjs           # Tailwind CSS config (CommonJS)
+├── tailwind.config.js            # Tailwind CSS config (ES Module)
+├── tsconfig.app.json             # TypeScript app config
+├── tsconfig.json                 # TypeScript base config
+├── tsconfig.node.json            # TypeScript Node config
+├── vite.config.ts                # Vite build configuration
+└── vitest.config.ts              # Vitest test configuration
 ```
 
 ### Backend

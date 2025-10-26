@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { FileText, Download, Calendar, TrendingUp, Users, DollarSign } from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 
@@ -45,8 +58,10 @@ const ReportsPage = () => {
 
   const getRevenueData = () => {
     const totalRevenue = bills?.reduce((sum, bill) => sum + bill.total, 0) || 0;
-    const paidRevenue = bills?.filter(b => b.status === 'paid').reduce((sum, bill) => sum + bill.total, 0) || 0;
-    const pendingRevenue = bills?.filter(b => b.status === 'pending').reduce((sum, bill) => sum + bill.total, 0) || 0;
+    const paidRevenue =
+      bills?.filter((b) => b.status === 'paid').reduce((sum, bill) => sum + bill.total, 0) || 0;
+    const pendingRevenue =
+      bills?.filter((b) => b.status === 'pending').reduce((sum, bill) => sum + bill.total, 0) || 0;
 
     return {
       total: totalRevenue,
@@ -58,8 +73,8 @@ const ReportsPage = () => {
 
   const getPatientData = () => {
     const totalPatients = patients?.length || 0;
-    const maleCount = patients?.filter(p => p.gender === 'male').length || 0;
-    const femaleCount = patients?.filter(p => p.gender === 'female').length || 0;
+    const maleCount = patients?.filter((p) => p.gender === 'male').length || 0;
+    const femaleCount = patients?.filter((p) => p.gender === 'female').length || 0;
 
     return {
       total: totalPatients,
@@ -70,9 +85,9 @@ const ReportsPage = () => {
 
   const getEncounterData = () => {
     const totalEncounters = encounters?.length || 0;
-    const completedCount = encounters?.filter(e => e.status === 'completed').length || 0;
-    const inProgressCount = encounters?.filter(e => e.status === 'in-progress').length || 0;
-    const scheduledCount = encounters?.filter(e => e.status === 'scheduled').length || 0;
+    const completedCount = encounters?.filter((e) => e.status === 'completed').length || 0;
+    const inProgressCount = encounters?.filter((e) => e.status === 'in-progress').length || 0;
+    const scheduledCount = encounters?.filter((e) => e.status === 'scheduled').length || 0;
 
     return {
       total: totalEncounters,
@@ -84,9 +99,9 @@ const ReportsPage = () => {
 
   const getLabData = () => {
     const totalLabs = labs?.length || 0;
-    const completedCount = labs?.filter(l => l.status === 'completed').length || 0;
-    const pendingCount = labs?.filter(l => l.status === 'pending').length || 0;
-    const inProgressCount = labs?.filter(l => l.status === 'in-progress').length || 0;
+    const completedCount = labs?.filter((l) => l.status === 'completed').length || 0;
+    const pendingCount = labs?.filter((l) => l.status === 'pending').length || 0;
+    const inProgressCount = labs?.filter((l) => l.status === 'in-progress').length || 0;
 
     return {
       total: totalLabs,
@@ -100,24 +115,64 @@ const ReportsPage = () => {
     switch (selectedReport) {
       case 'revenue': {
         const revenueData = getRevenueData();
+        const chartData = [
+          { name: 'Paid', value: revenueData.paid, color: '#10b981' },
+          { name: 'Pending', value: revenueData.pending, color: '#f97316' },
+        ];
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <p className="text-sm text-green-700 dark:text-green-400">Total Revenue</p>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-200">₹{revenueData.total.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-200">
+                  ₹{revenueData.total.toFixed(2)}
+                </p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-400">Paid</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">₹{revenueData.paid.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+                  ₹{revenueData.paid.toFixed(2)}
+                </p>
               </div>
               <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
                 <p className="text-sm text-orange-700 dark:text-orange-400">Pending</p>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-200">₹{revenueData.pending.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-200">
+                  ₹{revenueData.pending.toFixed(2)}
+                </p>
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Bills: {revenueData.count}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Bills: {revenueData.count}
+              </p>
+            </div>
+
+            {/* Revenue Chart */}
+            <div className="bg-white dark:bg-gray-700 p-6 rounded-lg mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Revenue Distribution
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ₹${value.toFixed(2)}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => `₹${value.toFixed(2)}`} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
@@ -125,21 +180,59 @@ const ReportsPage = () => {
 
       case 'patients': {
         const patientData = getPatientData();
+        const chartData = [
+          { name: 'Male', value: patientData.male, color: '#8b5cf6' },
+          { name: 'Female', value: patientData.female, color: '#ec4899' },
+        ];
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-400">Total Patients</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">{patientData.total}</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+                  {patientData.total}
+                </p>
               </div>
               <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
                 <p className="text-sm text-purple-700 dark:text-purple-400">Male</p>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-200">{patientData.male}</p>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-200">
+                  {patientData.male}
+                </p>
               </div>
               <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg">
                 <p className="text-sm text-pink-700 dark:text-pink-400">Female</p>
-                <p className="text-2xl font-bold text-pink-900 dark:text-pink-200">{patientData.female}</p>
+                <p className="text-2xl font-bold text-pink-900 dark:text-pink-200">
+                  {patientData.female}
+                </p>
               </div>
+            </div>
+
+            {/* Patient Gender Distribution Chart */}
+            <div className="bg-white dark:bg-gray-700 p-6 rounded-lg mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Gender Distribution
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
@@ -147,25 +240,60 @@ const ReportsPage = () => {
 
       case 'encounters': {
         const encounterData = getEncounterData();
+        const chartData = [
+          { name: 'Completed', value: encounterData.completed, fill: '#10b981' },
+          { name: 'In Progress', value: encounterData.inProgress, fill: '#3b82f6' },
+          { name: 'Scheduled', value: encounterData.scheduled, fill: '#eab308' },
+        ];
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
                 <p className="text-sm text-purple-700 dark:text-purple-400">Total Encounters</p>
-                <p className="text-2xl font-bold text-purple-900 dark:text-purple-200">{encounterData.total}</p>
+                <p className="text-2xl font-bold text-purple-900 dark:text-purple-200">
+                  {encounterData.total}
+                </p>
               </div>
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <p className="text-sm text-green-700 dark:text-green-400">Completed</p>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-200">{encounterData.completed}</p>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-200">
+                  {encounterData.completed}
+                </p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-400">In Progress</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">{encounterData.inProgress}</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+                  {encounterData.inProgress}
+                </p>
               </div>
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                 <p className="text-sm text-yellow-700 dark:text-yellow-400">Scheduled</p>
-                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-200">{encounterData.scheduled}</p>
+                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-200">
+                  {encounterData.scheduled}
+                </p>
               </div>
+            </div>
+
+            {/* Encounter Status Chart */}
+            <div className="bg-white dark:bg-gray-700 p-6 rounded-lg mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Encounter Status Distribution
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8">
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
@@ -173,25 +301,60 @@ const ReportsPage = () => {
 
       case 'labs': {
         const labData = getLabData();
+        const chartData = [
+          { name: 'Completed', value: labData.completed, fill: '#10b981' },
+          { name: 'In Progress', value: labData.inProgress, fill: '#3b82f6' },
+          { name: 'Pending', value: labData.pending, fill: '#f97316' },
+        ];
+
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                 <p className="text-sm text-yellow-700 dark:text-yellow-400">Total Lab Tests</p>
-                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-200">{labData.total}</p>
+                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-200">
+                  {labData.total}
+                </p>
               </div>
               <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
                 <p className="text-sm text-green-700 dark:text-green-400">Completed</p>
-                <p className="text-2xl font-bold text-green-900 dark:text-green-200">{labData.completed}</p>
+                <p className="text-2xl font-bold text-green-900 dark:text-green-200">
+                  {labData.completed}
+                </p>
               </div>
               <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                 <p className="text-sm text-blue-700 dark:text-blue-400">In Progress</p>
-                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">{labData.inProgress}</p>
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
+                  {labData.inProgress}
+                </p>
               </div>
               <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
                 <p className="text-sm text-orange-700 dark:text-orange-400">Pending</p>
-                <p className="text-2xl font-bold text-orange-900 dark:text-orange-200">{labData.pending}</p>
+                <p className="text-2xl font-bold text-orange-900 dark:text-orange-200">
+                  {labData.pending}
+                </p>
               </div>
+            </div>
+
+            {/* Lab Status Chart */}
+            <div className="bg-white dark:bg-gray-700 p-6 rounded-lg mt-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Lab Test Status Distribution
+              </h3>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8">
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
@@ -281,7 +444,7 @@ const ReportsPage = () => {
         {/* Report Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            {reportTypes.find(t => t.id === selectedReport)?.name}
+            {reportTypes.find((t) => t.id === selectedReport)?.name}
           </h2>
           {renderReportContent()}
         </div>
