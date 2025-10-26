@@ -33,7 +33,8 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 
 ## Tech Stack
 
-- **Frontend Framework**: React 19 with TypeScript
+### Frontend
+- **Framework**: React 19 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS 3
 - **Routing**: React Router v7
@@ -42,14 +43,23 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 - **Icons**: Lucide React
 - **Date Handling**: date-fns
 
+### Backend
+- **Framework**: NestJS 10 with TypeScript
+- **Database**: PostgreSQL 16
+- **ORM**: Prisma 5
+- **Authentication**: JWT with Passport
+- **Documentation**: Swagger/OpenAPI
+- **Container**: Docker & Docker Compose
+
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+ 
 - npm or yarn
+- PostgreSQL 16+ (for backend, or use Docker)
 
-### Installation
+### Frontend Setup
 
 1. Clone the repository:
 ```bash
@@ -69,36 +79,82 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
+### Backend Setup
+
+See the detailed [Backend Integration Guide](BACKEND_INTEGRATION.md) for complete setup instructions.
+
+**Quick Start:**
+
+1. Navigate to backend directory:
+```bash
+cd backend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start with Docker (PostgreSQL + Backend):
+```bash
+docker-compose up -d
+```
+
+4. Run migrations and seed:
+```bash
+npm run prisma:migrate
+npm run prisma:seed
+```
+
+The backend API will be available at `http://localhost:3000`
+API Documentation (Swagger): `http://localhost:3000/api/docs`
+
 ### Building for Production
 
+**Frontend:**
 ```bash
 npm run build
+```
+
+**Backend:**
+```bash
+cd backend
+npm run build
+npm run start:prod
 ```
 
 The build output will be in the `dist` directory.
 
 ### Running the Production Build
 
+**Frontend:**
 ```bash
 npm run preview
 ```
 
 ## Demo Credentials
 
+### Frontend (Mock API)
 - **Email**: admin@hospital.in
-- **Password**: any password (authentication is mocked)
+- **Password**: any password (authentication is mocked in frontend-only mode)
+
+### Backend API
+- **Email**: admin@hospital.in, doctor@hospital.in, or nurse@hospital.in
+- **Password**: password123
 
 ## Seeded Data
 
-The application comes with pre-seeded mock data including:
-- 3 patients with complete medical records
-- 3 encounters (patient visits)
-- 3 lab results
-- 2 prescriptions
-- 3 billing records
+The backend database comes with pre-seeded data including:
+- 3 users (admin, doctor, nurse)
+- 2 patients with complete medical records
+- 1 encounter
+- 1 lab result
+- 1 prescription
+- 1 billing record
 
 ## Project Structure
 
+### Frontend
 ```
 src/
 ├── components/          # Reusable UI components
@@ -121,6 +177,32 @@ src/
 └── main.tsx            # Application entry point
 ```
 
+### Backend
+```
+backend/
+├── src/
+│   ├── modules/          # Feature modules
+│   │   ├── auth/         # Authentication (JWT)
+│   │   ├── patients/     # Patient management
+│   │   ├── encounters/   # Medical encounters
+│   │   ├── labs/         # Lab results
+│   │   ├── prescriptions/# Prescriptions
+│   │   ├── billing/      # Billing & payments
+│   │   └── reports/      # Reports & analytics
+│   ├── common/           # Shared services (Prisma)
+│   ├── config/           # Configuration
+│   ├── app.module.ts     # Root module
+│   └── main.ts           # Entry point
+├── prisma/
+│   ├── schema.prisma     # Database schema
+│   └── seed.ts           # Database seeder
+├── .env.example          # Environment template
+├── docker-compose.yml    # Docker setup
+└── Dockerfile            # Container config
+```
+
+See [Backend README](backend/README.md) and [Backend Integration Guide](BACKEND_INTEGRATION.md) for more details.
+
 ## Indian Hospital Specific Features
 
 - **Indian Currency**: All amounts in ₹ (INR)
@@ -130,18 +212,30 @@ src/
 - **Blood Groups**: Common Indian blood group tracking
 - **Payment Methods**: UPI, Card, and Cash options
 
-## Mock API
+## API Options
 
-The application uses a mock API with simulated delays to mimic real-world API behavior. All data is stored in memory and resets on page refresh.
+The application supports two modes:
+
+### 1. Mock API (Default)
+The frontend includes a mock API with simulated delays to mimic real-world API behavior. All data is stored in memory and resets on page refresh. Perfect for frontend development and testing.
+
+### 2. Backend API
+A complete NestJS backend with PostgreSQL database is available in the `/backend` directory. See [Backend Integration Guide](BACKEND_INTEGRATION.md) for setup instructions.
 
 ## Development
 
 ### Available Scripts
 
+**Frontend:**
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+
+**Backend:**
+- `cd backend && npm run start:dev` - Start backend in dev mode
+- `cd backend && npm run build` - Build backend
+- `cd backend && npm run prisma:studio` - Open Prisma Studio
 
 ## Browser Support
 
