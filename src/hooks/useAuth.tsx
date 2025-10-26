@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types/index';
+import { logAuditEvent } from '../services/auditLogger';
 
 interface AuthContextType {
   user: User | null;
@@ -10,21 +11,64 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Secure token storage
+ * TODO: Replace localStorage with HttpOnly cookies for production
+ * HttpOnly cookies prevent XSS attacks by making tokens inaccessible to JavaScript
+ *
+ * Production implementation should:
+ * 1. Set tokens in HttpOnly cookies on the server
+ * 2. Use SameSite=Strict for CSRF protection
+ * 3. Set Secure flag to ensure HTTPS-only transmission
+ * 4. Implement token rotation and short expiration times
+ */
+const TokenStorage = {
+  getToken(): string | null {
+    // TODO: In production, token will be in HttpOnly cookie, not accessible here
+    return localStorage.getItem('auth_token');
+  },
+
+  setToken(token: string): void {
+    // TODO: In production, this will be set by server as HttpOnly cookie
+    localStorage.setItem('auth_token', token);
+  },
+
+  removeToken(): void {
+    // TODO: In production, clear cookie via server endpoint
+    localStorage.removeItem('auth_token');
+  },
+
+  getUser(): User | null {
+    const savedUser = localStorage.getItem('current_user');
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch (error) {
+        console.error('Failed to parse saved user', error);
+        return null;
+      }
+    }
+    return null;
+  },
+
+  setUser(user: User): void {
+    localStorage.setItem('current_user', JSON.stringify(user));
+  },
+
+  removeUser(): void {
+    localStorage.removeItem('current_user');
+  },
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('current_user');
+    const token = TokenStorage.getToken();
+    const savedUser = TokenStorage.getUser();
     if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (error) {
-        console.error('Failed to parse saved user', error);
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('current_user');
-      }
+      setUser(savedUser);
     }
   }, []);
 
@@ -42,20 +86,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     const { data } = await response.json();
-    localStorage.setItem('auth_token', data.token);
-    localStorage.setItem('current_user', JSON.stringify(data.user));
+    TokenStorage.setToken(data.token);
+    TokenStorage.setUser(data.user);
     setUser(data.user);
+
+    // Log successful login
+    await logAuditEvent({
+      userId: data.user.id,
+      userName: data.user.name,
+      userRole: data.user.role,
+      action: 'Login',
+      resource: 'Authentication',
+      resourceId: data.user.id,
+      details: `User logged in successfully`,
+    });
   };
 
   const logout = async () => {
-    const token = localStorage.getItem('auth_token');
-    if (token) {
+    const token = TokenStorage.getToken();
+    const currentUser = user;
+
+    if (token && currentUser) {
       try {
+        // Log logout before clearing user data
+        await logAuditEvent({
+          userId: currentUser.id,
+          userName: currentUser.name,
+          userRole: currentUser.role,
+          action: 'Logout',
+          resource: 'Authentication',
+          resourceId: currentUser.id,
+          details: `User logged out`,
+        });
+
         await fetch('/api/auth/logout', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({ token }),
         });
@@ -63,8 +131,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error('Logout request failed', error);
       }
     }
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('current_user');
+
+    TokenStorage.removeToken();
+    TokenStorage.removeUser();
     setUser(null);
   };
 

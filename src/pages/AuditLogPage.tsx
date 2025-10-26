@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Search, Calendar, User, FileText } from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { List } from 'react-window';
 import { AuditLogEntry } from '../types';
+import { getAuditLogs } from '../services/auditLogger';
 
 // Mock audit log data
 const mockAuditLogs: AuditLogEntry[] = [
@@ -127,14 +128,29 @@ const generateMoreLogs = (count: number): AuditLogEntry[] => {
   });
 };
 
-const allLogs = [...mockAuditLogs, ...generateMoreLogs(100)];
-
 const AuditLogPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   const [filterResource, setFilterResource] = useState('all');
+  const [logs, setLogs] = useState<AuditLogEntry[]>([]);
 
-  const filteredLogs = allLogs.filter((log) => {
+  // Load audit logs on mount and set up polling
+  useEffect(() => {
+    const loadLogs = () => {
+      const auditLogs = getAuditLogs();
+      // Merge with mock logs for demonstration
+      setLogs([...auditLogs, ...mockAuditLogs, ...generateMoreLogs(100)]);
+    };
+
+    loadLogs();
+
+    // Poll for new logs every 5 seconds
+    const interval = setInterval(loadLogs, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const filteredLogs = logs.filter((log) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch =
       log.userName.toLowerCase().includes(query) ||
@@ -171,7 +187,9 @@ const AuditLogPage = () => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <span className={`px-2 py-1 rounded text-xs font-medium ${getActionColor(log.action)}`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${getActionColor(log.action)}`}
+              >
                 {log.action}
               </span>
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">

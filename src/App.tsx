@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { I18nProvider } from './contexts/I18nContext';
 import { useGlobalShortcuts } from './hooks/useKeyboardShortcuts';
+import { canAccessRoute } from './utils/permissions';
 import PageSkeleton from './components/PageSkeleton';
 
 // Lazy load all page components for code-splitting
@@ -34,9 +35,20 @@ const queryClient = new QueryClient({
   },
 });
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+function PrivateRoute({ children, path }: { children: React.ReactNode; path?: string }) {
+  const { isAuthenticated, user } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
+  }
+
+  // Check role-based access if path is provided
+  if (path && user && !canAccessRoute(user.role, path)) {
+    // Redirect to dashboard if user doesn't have permission for this route
+    return <Navigate to="/" />;
+  }
+
+  return <>{children}</>;
 }
 
 function AppRoutes() {
@@ -49,7 +61,7 @@ function AppRoutes() {
         <Route
           path="/"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/">
               <DashboardPage />
             </PrivateRoute>
           }
@@ -57,7 +69,7 @@ function AppRoutes() {
         <Route
           path="/patients"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/patients">
               <PatientsPage />
             </PrivateRoute>
           }
@@ -65,7 +77,7 @@ function AppRoutes() {
         <Route
           path="/patient-search"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/patient-search">
               <PatientSearchPage />
             </PrivateRoute>
           }
@@ -73,7 +85,7 @@ function AppRoutes() {
         <Route
           path="/patients/:patientId"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/patients">
               <PatientChartPage />
             </PrivateRoute>
           }
@@ -81,7 +93,7 @@ function AppRoutes() {
         <Route
           path="/encounters"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/encounters">
               <EncountersPage />
             </PrivateRoute>
           }
@@ -89,7 +101,7 @@ function AppRoutes() {
         <Route
           path="/labs"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/labs">
               <LabsPage />
             </PrivateRoute>
           }
@@ -97,7 +109,7 @@ function AppRoutes() {
         <Route
           path="/prescriptions"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/prescriptions">
               <PrescriptionsPage />
             </PrivateRoute>
           }
@@ -105,7 +117,7 @@ function AppRoutes() {
         <Route
           path="/billing"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/billing">
               <BillingPage />
             </PrivateRoute>
           }
@@ -113,7 +125,7 @@ function AppRoutes() {
         <Route
           path="/reports"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/reports">
               <ReportsPage />
             </PrivateRoute>
           }
@@ -121,7 +133,7 @@ function AppRoutes() {
         <Route
           path="/settings"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/settings">
               <SettingsPage />
             </PrivateRoute>
           }
@@ -129,7 +141,7 @@ function AppRoutes() {
         <Route
           path="/audit-log"
           element={
-            <PrivateRoute>
+            <PrivateRoute path="/audit-log">
               <AuditLogPage />
             </PrivateRoute>
           }

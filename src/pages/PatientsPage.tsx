@@ -9,14 +9,23 @@ import { Patient } from '../types/index';
 import { PatientFormSchema, PatientFormData } from '../schemas/patient-form.schema';
 import { maskAadhaar, formatIndianMobile } from '../schemas/fhir.schema';
 import { findDuplicatePatients } from '../utils/duplicate-detection';
+import { useAuth } from '../hooks/useAuth';
+import { logAuditEvent } from '../services/auditLogger';
 
 const PatientsPage = () => {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
   const [duplicateWarning, setDuplicateWarning] = useState<Patient[]>([]);
-  
-  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<PatientFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    watch,
+  } = useForm<PatientFormData>({
     resolver: zodResolver(PatientFormSchema),
   });
 
@@ -26,31 +35,73 @@ const PatientsPage = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: PatientFormData) => api.createPatient(data as Omit<Patient, 'id' | 'registrationDate'>),
-    onSuccess: () => {
+    mutationFn: (data: PatientFormData) =>
+      api.createPatient(data as Omit<Patient, 'id' | 'registrationDate'>),
+    onSuccess: (newPatient) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       setShowModal(false);
       setDuplicateWarning([]);
       reset();
+
+      // Log audit event
+      if (user) {
+        logAuditEvent({
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          action: 'Created',
+          resource: 'Patient',
+          resourceId: newPatient.id,
+          details: `Created patient record for ${newPatient.firstName} ${newPatient.lastName}`,
+        });
+      }
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, ...data }: Partial<Patient> & { id: string }) => 
-      api.updatePatient(id, data),
-    onSuccess: () => {
+    mutationFn: ({ id, ...data }: Partial<Patient> & { id: string }) => api.updatePatient(id, data),
+    onSuccess: (updatedPatient) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       setShowModal(false);
       setEditingPatient(null);
       setDuplicateWarning([]);
       reset();
+
+      // Log audit event
+      if (user) {
+        logAuditEvent({
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          action: 'Updated',
+          resource: 'Patient',
+          resourceId: updatedPatient.id,
+          details: `Updated patient record for ${updatedPatient.firstName} ${updatedPatient.lastName}`,
+        });
+      }
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => api.deletePatient(id),
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
+
+      // Log audit event
+      if (user) {
+        const deletedPatient = patients?.find((p) => p.id === deletedId);
+        logAuditEvent({
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          action: 'Deleted',
+          resource: 'Patient',
+          resourceId: deletedId,
+          details: deletedPatient
+            ? `Deleted patient record for ${deletedPatient.firstName} ${deletedPatient.lastName}`
+            : `Deleted patient record ${deletedId}`,
+        });
+      }
     },
   });
 
@@ -61,20 +112,18 @@ const PatientsPage = () => {
       id: editingPatient?.id || '',
       registrationDate: editingPatient?.registrationDate || '',
     };
-    
-    const duplicates = findDuplicatePatients(
-      patientToCheck, 
-      patients || [], 
-      editingPatient?.id
-    );
-    
+
+    const duplicates = findDuplicatePatients(patientToCheck, patients || [], editingPatient?.id);
+
     if (duplicates.length > 0 && !duplicateWarning.length) {
       setDuplicateWarning(duplicates);
       return;
     }
-    
+
     if (editingPatient) {
-      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & { id: string });
+      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & {
+        id: string;
+      });
     } else {
       createMutation.mutate(data);
     }
@@ -102,7 +151,9 @@ const PatientsPage = () => {
   const handleForceSave = () => {
     const data = watch();
     if (editingPatient) {
-      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & { id: string });
+      updateMutation.mutate({ ...data, id: editingPatient.id } as Partial<Patient> & {
+        id: string;
+      });
     } else {
       createMutation.mutate(data as PatientFormData);
     }
@@ -118,9 +169,10 @@ const PatientsPage = () => {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label="Add new patient"
           >
-            <Plus size={20} />
+            <Plus size={20} aria-hidden="true" />
             Add Patient
           </button>
         </div>
@@ -131,17 +183,61 @@ const PatientsPage = () => {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table
+              className="min-w-full divide-y divide-gray-200"
+              role="table"
+              aria-label="Patient registry table"
+            >
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gender</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">DOB</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aadhaar</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">City</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    ID
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    Name
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    Gender
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    DOB
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    Phone
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    Aadhaar
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    City
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+                    scope="col"
+                  >
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -172,15 +268,17 @@ const PatientsPage = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEdit(patient)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded p-1"
+                          aria-label={`Edit patient ${patient.firstName} ${patient.lastName}`}
                         >
-                          <Edit size={18} />
+                          <Edit size={18} aria-hidden="true" />
                         </button>
                         <button
                           onClick={() => handleDelete(patient.id)}
-                          className="text-red-600 hover:text-red-800"
+                          className="text-red-600 hover:text-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 rounded p-1"
+                          aria-label={`Delete patient ${patient.firstName} ${patient.lastName}`}
                         >
-                          <Trash2 size={18} />
+                          <Trash2 size={18} aria-hidden="true" />
                         </button>
                       </div>
                     </td>
@@ -192,28 +290,46 @@ const PatientsPage = () => {
         )}
 
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="patient-modal-title"
+          >
             <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-center p-6 border-b">
-                <h2 className="text-xl font-semibold">
+                <h2 id="patient-modal-title" className="text-xl font-semibold">
                   {editingPatient ? 'Edit Patient' : 'Add New Patient'}
                 </h2>
-                <button onClick={handleCloseModal} className="text-gray-500 hover:text-gray-700">
-                  <X size={24} />
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 rounded p-1"
+                  aria-label="Close modal"
+                >
+                  <X size={24} aria-hidden="true" />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
                 {duplicateWarning.length > 0 && (
-                  <div className="bg-yellow-50 border border-yellow-400 rounded-lg p-4">
+                  <div
+                    className="bg-yellow-50 border border-yellow-400 rounded-lg p-4"
+                    role="alert"
+                    aria-live="polite"
+                  >
                     <div className="flex items-start gap-2">
-                      <AlertTriangle className="text-yellow-600 mt-0.5" size={20} />
+                      <AlertTriangle
+                        className="text-yellow-600 mt-0.5"
+                        size={20}
+                        aria-hidden="true"
+                      />
                       <div className="flex-1">
                         <h3 className="text-sm font-semibold text-yellow-800 mb-1">
                           Potential Duplicate Patient Detected
                         </h3>
                         <p className="text-sm text-yellow-700 mb-2">
-                          A patient with the same name, date of birth, and phone number already exists:
+                          A patient with the same name, date of birth, and phone number already
+                          exists:
                         </p>
                         <ul className="text-sm text-yellow-700 space-y-1">
                           {duplicateWarning.map((dup) => (
@@ -286,9 +402,7 @@ const PatientsPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Gender *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
                     <select
                       {...register('gender')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -319,9 +433,7 @@ const PatientsPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
                     <input
                       type="email"
                       {...register('email')}
@@ -351,9 +463,7 @@ const PatientsPage = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
                   <input
                     {...register('address')}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -365,9 +475,7 @@ const PatientsPage = () => {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      City *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                     <input
                       {...register('city')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -378,9 +486,7 @@ const PatientsPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      State *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
                     <input
                       {...register('state')}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
