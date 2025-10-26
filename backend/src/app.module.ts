@@ -9,6 +9,7 @@ import { LabsModule } from './modules/labs/labs.module';
 import { PrescriptionsModule } from './modules/prescriptions/prescriptions.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     PrescriptionsModule,
     BillingModule,
     ReportsModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
