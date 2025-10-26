@@ -6,9 +6,13 @@ import { format } from 'date-fns';
 import { Plus, WifiOff, Upload } from 'lucide-react';
 import { useI18n } from '../hooks/useI18n';
 import { Encounter } from '../types';
+import { sanitizeRichText } from '../utils/sanitize';
+import { useAuth } from '../hooks/useAuth';
+import { logAuditEvent } from '../services/auditLogger';
 
 const EncountersPage = () => {
   const { t } = useI18n();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -57,6 +61,21 @@ const EncountersPage = () => {
 
   const createEncounterMutation = useMutation({
     mutationFn: async (encounterData: Partial<Encounter>) => {
+      // Sanitize SOAP notes before saving
+      if (encounterData.soapNotes) {
+        encounterData.soapNotes = {
+          subjective: sanitizeRichText(encounterData.soapNotes.subjective || ''),
+          objective: sanitizeRichText(encounterData.soapNotes.objective || ''),
+          assessment: sanitizeRichText(encounterData.soapNotes.assessment || ''),
+          plan: sanitizeRichText(encounterData.soapNotes.plan || ''),
+        };
+      }
+
+      // Sanitize notes
+      if (encounterData.notes) {
+        encounterData.notes = sanitizeRichText(encounterData.notes);
+      }
+
       if (!isOnline) {
         // Store in offline queue
         const queue = JSON.parse(localStorage.getItem('syncQueue') || '[]');
@@ -74,10 +93,23 @@ const EncountersPage = () => {
       }
       return api.createEncounter(encounterData);
     },
-    onSuccess: () => {
+    onSuccess: (newEncounter: Encounter | { id: string; patientName: string }) => {
       queryClient.invalidateQueries({ queryKey: ['encounters'] });
       setShowForm(false);
       resetForm();
+
+      // Log audit event
+      if (user && newEncounter?.id) {
+        logAuditEvent({
+          userId: user.id,
+          userName: user.name,
+          userRole: user.role,
+          action: 'Created',
+          resource: 'Encounter',
+          resourceId: newEncounter.id,
+          details: `Created encounter for patient ${newEncounter.patientName}`,
+        });
+      }
     },
   });
 
@@ -111,9 +143,13 @@ const EncountersPage = () => {
       diagnosis: formData.soapNotes.assessment,
       notes: `Subjective: ${formData.soapNotes.subjective}\nObjective: ${formData.soapNotes.objective}\nAssessment: ${formData.soapNotes.assessment}\nPlan: ${formData.soapNotes.plan}`,
       vitalSigns: {
-        temperature: formData.vitalSigns.temperature ? parseFloat(formData.vitalSigns.temperature) : undefined,
+        temperature: formData.vitalSigns.temperature
+          ? parseFloat(formData.vitalSigns.temperature)
+          : undefined,
         bloodPressure: formData.vitalSigns.bloodPressure || undefined,
-        heartRate: formData.vitalSigns.heartRate ? parseInt(formData.vitalSigns.heartRate) : undefined,
+        heartRate: formData.vitalSigns.heartRate
+          ? parseInt(formData.vitalSigns.heartRate)
+          : undefined,
         spo2: formData.vitalSigns.spo2 ? parseInt(formData.vitalSigns.spo2) : undefined,
         weight: formData.vitalSigns.weight ? parseFloat(formData.vitalSigns.weight) : undefined,
         height: formData.vitalSigns.height ? parseFloat(formData.vitalSigns.height) : undefined,
@@ -149,7 +185,9 @@ const EncountersPage = () => {
             <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
               {t('encounters.title')}
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">Patient visit records with SOAP notes</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">
+              Patient visit records with SOAP notes
+            </p>
           </div>
           <div className="flex gap-3">
             {!isOnline && (
@@ -158,15 +196,19 @@ const EncountersPage = () => {
                 <span className="text-sm font-medium">Offline Mode</span>
               </div>
             )}
-            {!isOnline && JSON.parse(localStorage.getItem('syncQueue') || '[]').some((item: { synced: boolean }) => !item.synced) && isOnline && (
-              <button
-                onClick={syncOfflineData}
-                className="flex items-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Upload size={20} />
-                Sync Offline Data
-              </button>
-            )}
+            {!isOnline &&
+              JSON.parse(localStorage.getItem('syncQueue') || '[]').some(
+                (item: { synced: boolean }) => !item.synced
+              ) &&
+              isOnline && (
+                <button
+                  onClick={syncOfflineData}
+                  className="flex items-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Upload size={20} />
+                  Sync Offline Data
+                </button>
+              )}
             <button
               onClick={() => setShowForm(!showForm)}
               className="flex items-center gap-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
@@ -192,7 +234,7 @@ const EncountersPage = () => {
                   required
                   value={formData.patientId}
                   onChange={(e) => {
-                    const patient = patients?.find(p => p.id === e.target.value);
+                    const patient = patients?.find((p) => p.id === e.target.value);
                     setFormData({
                       ...formData,
                       patientId: e.target.value,
@@ -202,7 +244,7 @@ const EncountersPage = () => {
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                 >
                   <option value="">Select Patient</option>
-                  {patients?.map(patient => (
+                  {patients?.map((patient) => (
                     <option key={patient.id} value={patient.id}>
                       {patient.firstName} {patient.lastName} ({patient.id})
                     </option>
@@ -217,7 +259,12 @@ const EncountersPage = () => {
                 <select
                   required
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as 'consultation' | 'followup' | 'emergency' })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      type: e.target.value as 'consultation' | 'followup' | 'emergency',
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                 >
                   <option value="consultation">Consultation</option>
@@ -242,7 +289,9 @@ const EncountersPage = () => {
 
             {/* Vital Signs */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Vital Signs</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                Vital Signs
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -252,10 +301,12 @@ const EncountersPage = () => {
                     type="number"
                     step="0.1"
                     value={formData.vitalSigns.temperature}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, temperature: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, temperature: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -267,10 +318,12 @@ const EncountersPage = () => {
                     type="text"
                     placeholder="120/80"
                     value={formData.vitalSigns.bloodPressure}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, bloodPressure: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, bloodPressure: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -281,10 +334,12 @@ const EncountersPage = () => {
                   <input
                     type="number"
                     value={formData.vitalSigns.heartRate}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, heartRate: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, heartRate: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -295,10 +350,12 @@ const EncountersPage = () => {
                   <input
                     type="number"
                     value={formData.vitalSigns.spo2}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, spo2: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, spo2: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -310,10 +367,12 @@ const EncountersPage = () => {
                     type="number"
                     step="0.1"
                     value={formData.vitalSigns.weight}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, weight: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, weight: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -325,10 +384,12 @@ const EncountersPage = () => {
                     type="number"
                     step="0.1"
                     value={formData.vitalSigns.height}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      vitalSigns: { ...formData.vitalSigns, height: e.target.value }
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        vitalSigns: { ...formData.vitalSigns, height: e.target.value },
+                      })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   />
                 </div>
@@ -338,7 +399,7 @@ const EncountersPage = () => {
             {/* SOAP Notes */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">SOAP Notes</h3>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Subjective (Patient's complaint and history)
@@ -347,10 +408,12 @@ const EncountersPage = () => {
                   required
                   rows={3}
                   value={formData.soapNotes.subjective}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    soapNotes: { ...formData.soapNotes, subjective: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      soapNotes: { ...formData.soapNotes, subjective: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   placeholder="What the patient tells you about their symptoms..."
                 />
@@ -364,10 +427,12 @@ const EncountersPage = () => {
                   required
                   rows={3}
                   value={formData.soapNotes.objective}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    soapNotes: { ...formData.soapNotes, objective: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      soapNotes: { ...formData.soapNotes, objective: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   placeholder="Physical examination findings, test results..."
                 />
@@ -381,10 +446,12 @@ const EncountersPage = () => {
                   required
                   rows={2}
                   value={formData.soapNotes.assessment}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    soapNotes: { ...formData.soapNotes, assessment: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      soapNotes: { ...formData.soapNotes, assessment: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   placeholder="Your diagnosis based on S and O..."
                 />
@@ -398,10 +465,12 @@ const EncountersPage = () => {
                   required
                   rows={3}
                   value={formData.soapNotes.plan}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    soapNotes: { ...formData.soapNotes, plan: e.target.value }
-                  })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      soapNotes: { ...formData.soapNotes, plan: e.target.value },
+                    })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-gray-100"
                   placeholder="Treatment plan, medications, follow-up..."
                 />
@@ -451,10 +520,10 @@ const EncountersPage = () => {
                       encounter.status === 'completed'
                         ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                         : encounter.status === 'in-progress'
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                        : encounter.status === 'scheduled'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                          : encounter.status === 'scheduled'
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                     }`}
                   >
                     {encounter.status}
@@ -465,64 +534,88 @@ const EncountersPage = () => {
                   <div className="space-y-3">
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Date & Time</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{format(new Date(encounter.date), 'PPp')}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {format(new Date(encounter.date), 'PPp')}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100 capitalize">{encounter.type}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100 capitalize">
+                        {encounter.type}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Doctor</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.doctorName}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {encounter.doctorName}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Chief Complaint</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.chiefComplaint}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {encounter.chiefComplaint}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600 dark:text-gray-400">Diagnosis</p>
-                      <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.diagnosis}</p>
+                      <p className="font-medium text-gray-900 dark:text-gray-100">
+                        {encounter.diagnosis}
+                      </p>
                     </div>
                   </div>
 
                   {encounter.vitalSigns && (
                     <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Vital Signs</h4>
+                      <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                        Vital Signs
+                      </h4>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         {encounter.vitalSigns.temperature && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">Temperature</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.temperature}°F</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.temperature}°F
+                            </p>
                           </div>
                         )}
                         {encounter.vitalSigns.bloodPressure && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">BP</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.bloodPressure}</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.bloodPressure}
+                            </p>
                           </div>
                         )}
                         {encounter.vitalSigns.heartRate && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">Heart Rate</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.heartRate} bpm</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.heartRate} bpm
+                            </p>
                           </div>
                         )}
                         {encounter.vitalSigns.spo2 && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">SpO2</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.spo2}%</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.spo2}%
+                            </p>
                           </div>
                         )}
                         {encounter.vitalSigns.weight && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">Weight</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.weight} kg</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.weight} kg
+                            </p>
                           </div>
                         )}
                         {encounter.vitalSigns.height && (
                           <div>
                             <p className="text-gray-600 dark:text-gray-400">Height</p>
-                            <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.vitalSigns.height} cm</p>
+                            <p className="font-medium text-gray-900 dark:text-gray-100">
+                              {encounter.vitalSigns.height} cm
+                            </p>
                           </div>
                         )}
                       </div>
@@ -533,7 +626,9 @@ const EncountersPage = () => {
                 {encounter.notes && (
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <p className="text-sm text-gray-600 dark:text-gray-400">Notes</p>
-                    <p className="mt-1 text-gray-900 dark:text-gray-100 whitespace-pre-line">{encounter.notes}</p>
+                    <p className="mt-1 text-gray-900 dark:text-gray-100 whitespace-pre-line">
+                      {encounter.notes}
+                    </p>
                   </div>
                 )}
               </div>
