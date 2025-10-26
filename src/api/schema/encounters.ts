@@ -2,7 +2,14 @@
  * Encounter API Schema
  */
 
-import { ApiResponse, PaginatedResponse, Endpoint, PaginationParams, SortParams, FilterParams } from './common';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  Endpoint,
+  PaginationParams,
+  SortParams,
+  FilterParams,
+} from './common';
 import { Encounter } from '../../types/index';
 
 // Request/Response Types

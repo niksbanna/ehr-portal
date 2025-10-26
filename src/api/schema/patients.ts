@@ -2,7 +2,14 @@
  * Patient API Schema
  */
 
-import { ApiResponse, PaginatedResponse, Endpoint, PaginationParams, SortParams, FilterParams } from './common';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  Endpoint,
+  PaginationParams,
+  SortParams,
+  FilterParams,
+} from './common';
 import { Patient } from '../../types/index';
 
 // Request/Response Types

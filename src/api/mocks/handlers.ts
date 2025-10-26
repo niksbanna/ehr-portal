@@ -3,7 +3,14 @@
  */
 
 import { http, HttpResponse, delay } from 'msw';
-import { generatePatients, generateEncounters, generateLabResults, generatePrescriptions, icd10CodesData, drugsData } from './generators';
+import {
+  generatePatients,
+  generateEncounters,
+  generateLabResults,
+  generatePrescriptions,
+  icd10CodesData,
+  drugsData,
+} from './generators';
 import { Patient, Encounter, LabResult, Prescription, User } from '../../types/index';
 import { Drug, ICD10Code } from '../schema';
 
@@ -82,17 +89,27 @@ export const authHandlers = [
 
     if (shouldSimulateError()) {
       return HttpResponse.json(
-        { error: 'ServiceUnavailable', message: 'Service temporarily unavailable', statusCode: 503, timestamp: new Date().toISOString() },
+        {
+          error: 'ServiceUnavailable',
+          message: 'Service temporarily unavailable',
+          statusCode: 503,
+          timestamp: new Date().toISOString(),
+        },
         { status: 503 }
       );
     }
 
-    const body = await request.json() as { email: string; password: string };
-    const user = mockUsers.find(u => u.email === body.email);
+    const body = (await request.json()) as { email: string; password: string };
+    const user = mockUsers.find((u) => u.email === body.email);
 
     if (!user || !body.password) {
       return HttpResponse.json(
-        { error: 'Unauthorized', message: 'Invalid credentials', statusCode: 401, timestamp: new Date().toISOString() },
+        {
+          error: 'Unauthorized',
+          message: 'Invalid credentials',
+          statusCode: 401,
+          timestamp: new Date().toISOString(),
+        },
         { status: 401 }
       );
     }
@@ -131,7 +148,12 @@ export const authHandlers = [
     const user = getUserFromToken(request.headers.get('Authorization'));
     if (!user) {
       return HttpResponse.json(
-        { error: 'Unauthorized', message: 'Not authenticated', statusCode: 401, timestamp: new Date().toISOString() },
+        {
+          error: 'Unauthorized',
+          message: 'Not authenticated',
+          statusCode: 401,
+          timestamp: new Date().toISOString(),
+        },
         { status: 401 }
       );
     }
@@ -149,7 +171,12 @@ export const patientHandlers = [
 
     if (shouldSimulateError()) {
       return HttpResponse.json(
-        { error: 'InternalServerError', message: 'Failed to fetch patients', statusCode: 500, timestamp: new Date().toISOString() },
+        {
+          error: 'InternalServerError',
+          message: 'Failed to fetch patients',
+          statusCode: 500,
+          timestamp: new Date().toISOString(),
+        },
         { status: 500 }
       );
     }
@@ -162,11 +189,12 @@ export const patientHandlers = [
     let filteredPatients = mockPatients;
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredPatients = mockPatients.filter(p =>
-        p.firstName.toLowerCase().includes(searchLower) ||
-        p.lastName.toLowerCase().includes(searchLower) ||
-        p.email.toLowerCase().includes(searchLower) ||
-        p.phone.includes(search)
+      filteredPatients = mockPatients.filter(
+        (p) =>
+          p.firstName.toLowerCase().includes(searchLower) ||
+          p.lastName.toLowerCase().includes(searchLower) ||
+          p.email.toLowerCase().includes(searchLower) ||
+          p.phone.includes(search)
       );
     }
 
@@ -175,10 +203,15 @@ export const patientHandlers = [
 
   http.get('/api/patients/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const patient = mockPatients.find(p => p.id === params.id);
+    const patient = mockPatients.find((p) => p.id === params.id);
     if (!patient) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Patient not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Patient not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -190,29 +223,37 @@ export const patientHandlers = [
 
   http.post('/api/patients', async ({ request }) => {
     await delay(getRealisticDelay());
-    const body = await request.json() as Omit<Patient, 'id' | 'registrationDate'>;
+    const body = (await request.json()) as Omit<Patient, 'id' | 'registrationDate'>;
     const newPatient: Patient = {
       ...body,
       id: `P${String(mockPatients.length + 1).padStart(3, '0')}`,
       registrationDate: new Date().toISOString().split('T')[0].split('-').reverse().join('-'),
     };
     mockPatients.push(newPatient);
-    return HttpResponse.json({
-      data: newPatient,
-      timestamp: new Date().toISOString(),
-    }, { status: 201 });
+    return HttpResponse.json(
+      {
+        data: newPatient,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 201 }
+    );
   }),
 
   http.put('/api/patients/:id', async ({ params, request }) => {
     await delay(getRealisticDelay());
-    const index = mockPatients.findIndex(p => p.id === params.id);
+    const index = mockPatients.findIndex((p) => p.id === params.id);
     if (index === -1) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Patient not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Patient not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
-    const updates = await request.json() as Partial<Patient>;
+    const updates = (await request.json()) as Partial<Patient>;
     mockPatients[index] = { ...mockPatients[index], ...updates };
     return HttpResponse.json({
       data: mockPatients[index],
@@ -222,10 +263,15 @@ export const patientHandlers = [
 
   http.delete('/api/patients/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const index = mockPatients.findIndex(p => p.id === params.id);
+    const index = mockPatients.findIndex((p) => p.id === params.id);
     if (index === -1) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Patient not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Patient not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -244,7 +290,12 @@ export const encounterHandlers = [
 
     if (shouldSimulateError()) {
       return HttpResponse.json(
-        { error: 'InternalServerError', message: 'Failed to fetch encounters', statusCode: 500, timestamp: new Date().toISOString() },
+        {
+          error: 'InternalServerError',
+          message: 'Failed to fetch encounters',
+          statusCode: 500,
+          timestamp: new Date().toISOString(),
+        },
         { status: 500 }
       );
     }
@@ -257,10 +308,10 @@ export const encounterHandlers = [
 
     let filteredEncounters = mockEncounters;
     if (patientId) {
-      filteredEncounters = filteredEncounters.filter(e => e.patientId === patientId);
+      filteredEncounters = filteredEncounters.filter((e) => e.patientId === patientId);
     }
     if (status) {
-      filteredEncounters = filteredEncounters.filter(e => e.status === status);
+      filteredEncounters = filteredEncounters.filter((e) => e.status === status);
     }
 
     return HttpResponse.json(paginate(filteredEncounters, page, limit));
@@ -268,10 +319,15 @@ export const encounterHandlers = [
 
   http.get('/api/encounters/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const encounter = mockEncounters.find(e => e.id === params.id);
+    const encounter = mockEncounters.find((e) => e.id === params.id);
     if (!encounter) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Encounter not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Encounter not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -283,28 +339,36 @@ export const encounterHandlers = [
 
   http.post('/api/encounters', async ({ request }) => {
     await delay(getRealisticDelay());
-    const body = await request.json() as Omit<Encounter, 'id'>;
+    const body = (await request.json()) as Omit<Encounter, 'id'>;
     const newEncounter: Encounter = {
       ...body,
       id: `E${String(mockEncounters.length + 1).padStart(3, '0')}`,
     };
     mockEncounters.unshift(newEncounter);
-    return HttpResponse.json({
-      data: newEncounter,
-      timestamp: new Date().toISOString(),
-    }, { status: 201 });
+    return HttpResponse.json(
+      {
+        data: newEncounter,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 201 }
+    );
   }),
 
   http.put('/api/encounters/:id', async ({ params, request }) => {
     await delay(getRealisticDelay());
-    const index = mockEncounters.findIndex(e => e.id === params.id);
+    const index = mockEncounters.findIndex((e) => e.id === params.id);
     if (index === -1) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Encounter not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Encounter not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
-    const updates = await request.json() as Partial<Encounter>;
+    const updates = (await request.json()) as Partial<Encounter>;
     mockEncounters[index] = { ...mockEncounters[index], ...updates };
     return HttpResponse.json({
       data: mockEncounters[index],
@@ -317,7 +381,7 @@ export const encounterHandlers = [
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
-    const patientEncounters = mockEncounters.filter(e => e.patientId === params.patientId);
+    const patientEncounters = mockEncounters.filter((e) => e.patientId === params.patientId);
     return HttpResponse.json(paginate(patientEncounters, page, limit));
   }),
 ];
@@ -329,7 +393,12 @@ export const labHandlers = [
 
     if (shouldSimulateError()) {
       return HttpResponse.json(
-        { error: 'InternalServerError', message: 'Failed to fetch lab results', statusCode: 500, timestamp: new Date().toISOString() },
+        {
+          error: 'InternalServerError',
+          message: 'Failed to fetch lab results',
+          statusCode: 500,
+          timestamp: new Date().toISOString(),
+        },
         { status: 500 }
       );
     }
@@ -342,10 +411,10 @@ export const labHandlers = [
 
     let filteredLabs = mockLabResults;
     if (patientId) {
-      filteredLabs = filteredLabs.filter(l => l.patientId === patientId);
+      filteredLabs = filteredLabs.filter((l) => l.patientId === patientId);
     }
     if (status) {
-      filteredLabs = filteredLabs.filter(l => l.status === status);
+      filteredLabs = filteredLabs.filter((l) => l.status === status);
     }
 
     return HttpResponse.json(paginate(filteredLabs, page, limit));
@@ -353,10 +422,15 @@ export const labHandlers = [
 
   http.get('/api/labs/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const lab = mockLabResults.find(l => l.id === params.id);
+    const lab = mockLabResults.find((l) => l.id === params.id);
     if (!lab) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Lab result not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Lab result not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -368,28 +442,36 @@ export const labHandlers = [
 
   http.post('/api/labs', async ({ request }) => {
     await delay(getRealisticDelay());
-    const body = await request.json() as Omit<LabResult, 'id'>;
+    const body = (await request.json()) as Omit<LabResult, 'id'>;
     const newLab: LabResult = {
       ...body,
       id: `L${String(mockLabResults.length + 1).padStart(3, '0')}`,
     };
     mockLabResults.unshift(newLab);
-    return HttpResponse.json({
-      data: newLab,
-      timestamp: new Date().toISOString(),
-    }, { status: 201 });
+    return HttpResponse.json(
+      {
+        data: newLab,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 201 }
+    );
   }),
 
   http.put('/api/labs/:id', async ({ params, request }) => {
     await delay(getRealisticDelay());
-    const index = mockLabResults.findIndex(l => l.id === params.id);
+    const index = mockLabResults.findIndex((l) => l.id === params.id);
     if (index === -1) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Lab result not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Lab result not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
-    const updates = await request.json() as Partial<LabResult>;
+    const updates = (await request.json()) as Partial<LabResult>;
     mockLabResults[index] = { ...mockLabResults[index], ...updates };
     return HttpResponse.json({
       data: mockLabResults[index],
@@ -402,13 +484,13 @@ export const labHandlers = [
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
-    const patientLabs = mockLabResults.filter(l => l.patientId === params.patientId);
+    const patientLabs = mockLabResults.filter((l) => l.patientId === params.patientId);
     return HttpResponse.json(paginate(patientLabs, page, limit));
   }),
 
   http.get('/api/encounters/:encounterId/labs', async ({ params }) => {
     await delay(getRealisticDelay());
-    const encounterLabs = mockLabResults.filter(l => l.encounterId === params.encounterId);
+    const encounterLabs = mockLabResults.filter((l) => l.encounterId === params.encounterId);
     return HttpResponse.json({
       data: encounterLabs,
       timestamp: new Date().toISOString(),
@@ -427,7 +509,7 @@ export const prescriptionHandlers = [
 
     let filteredPrescriptions = mockPrescriptions;
     if (patientId) {
-      filteredPrescriptions = filteredPrescriptions.filter(p => p.patientId === patientId);
+      filteredPrescriptions = filteredPrescriptions.filter((p) => p.patientId === patientId);
     }
 
     return HttpResponse.json(paginate(filteredPrescriptions, page, limit));
@@ -435,10 +517,15 @@ export const prescriptionHandlers = [
 
   http.get('/api/prescriptions/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const prescription = mockPrescriptions.find(p => p.id === params.id);
+    const prescription = mockPrescriptions.find((p) => p.id === params.id);
     if (!prescription) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Prescription not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Prescription not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -450,16 +537,19 @@ export const prescriptionHandlers = [
 
   http.post('/api/prescriptions', async ({ request }) => {
     await delay(getRealisticDelay());
-    const body = await request.json() as Omit<Prescription, 'id'>;
+    const body = (await request.json()) as Omit<Prescription, 'id'>;
     const newPrescription: Prescription = {
       ...body,
       id: `Rx${String(mockPrescriptions.length + 1).padStart(3, '0')}`,
     };
     mockPrescriptions.push(newPrescription);
-    return HttpResponse.json({
-      data: newPrescription,
-      timestamp: new Date().toISOString(),
-    }, { status: 201 });
+    return HttpResponse.json(
+      {
+        data: newPrescription,
+        timestamp: new Date().toISOString(),
+      },
+      { status: 201 }
+    );
   }),
 
   http.get('/api/patients/:patientId/prescriptions', async ({ params, request }) => {
@@ -467,13 +557,15 @@ export const prescriptionHandlers = [
     const url = new URL(request.url);
     const page = parseInt(url.searchParams.get('page') || '1');
     const limit = parseInt(url.searchParams.get('limit') || '10');
-    const patientPrescriptions = mockPrescriptions.filter(p => p.patientId === params.patientId);
+    const patientPrescriptions = mockPrescriptions.filter((p) => p.patientId === params.patientId);
     return HttpResponse.json(paginate(patientPrescriptions, page, limit));
   }),
 
   http.get('/api/encounters/:encounterId/prescriptions', async ({ params }) => {
     await delay(getRealisticDelay());
-    const encounterPrescriptions = mockPrescriptions.filter(p => p.encounterId === params.encounterId);
+    const encounterPrescriptions = mockPrescriptions.filter(
+      (p) => p.encounterId === params.encounterId
+    );
     return HttpResponse.json({
       data: encounterPrescriptions,
       timestamp: new Date().toISOString(),
@@ -493,9 +585,10 @@ export const drugHandlers = [
     let filteredDrugs = mockDrugs;
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredDrugs = mockDrugs.filter(d =>
-        d.name.toLowerCase().includes(searchLower) ||
-        d.genericName.toLowerCase().includes(searchLower)
+      filteredDrugs = mockDrugs.filter(
+        (d) =>
+          d.name.toLowerCase().includes(searchLower) ||
+          d.genericName.toLowerCase().includes(searchLower)
       );
     }
 
@@ -504,10 +597,15 @@ export const drugHandlers = [
 
   http.get('/api/drugs/:id', async ({ params }) => {
     await delay(getRealisticDelay());
-    const drug = mockDrugs.find(d => d.id === params.id);
+    const drug = mockDrugs.find((d) => d.id === params.id);
     if (!drug) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'Drug not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'Drug not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -522,10 +620,13 @@ export const drugHandlers = [
     const url = new URL(request.url);
     const query = url.searchParams.get('query') || '';
     const queryLower = query.toLowerCase();
-    const results = mockDrugs.filter(d =>
-      d.name.toLowerCase().includes(queryLower) ||
-      d.genericName.toLowerCase().includes(queryLower)
-    ).slice(0, 20);
+    const results = mockDrugs
+      .filter(
+        (d) =>
+          d.name.toLowerCase().includes(queryLower) ||
+          d.genericName.toLowerCase().includes(queryLower)
+      )
+      .slice(0, 20);
     return HttpResponse.json({
       data: results,
       timestamp: new Date().toISOString(),
@@ -545,9 +646,10 @@ export const icd10Handlers = [
     let filteredCodes = mockICD10Codes;
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredCodes = mockICD10Codes.filter(c =>
-        c.code.toLowerCase().includes(searchLower) ||
-        c.description.toLowerCase().includes(searchLower)
+      filteredCodes = mockICD10Codes.filter(
+        (c) =>
+          c.code.toLowerCase().includes(searchLower) ||
+          c.description.toLowerCase().includes(searchLower)
       );
     }
 
@@ -556,10 +658,15 @@ export const icd10Handlers = [
 
   http.get('/api/icd10/:code', async ({ params }) => {
     await delay(getRealisticDelay());
-    const code = mockICD10Codes.find(c => c.code === params.code);
+    const code = mockICD10Codes.find((c) => c.code === params.code);
     if (!code) {
       return HttpResponse.json(
-        { error: 'NotFound', message: 'ICD-10 code not found', statusCode: 404, timestamp: new Date().toISOString() },
+        {
+          error: 'NotFound',
+          message: 'ICD-10 code not found',
+          statusCode: 404,
+          timestamp: new Date().toISOString(),
+        },
         { status: 404 }
       );
     }
@@ -574,10 +681,13 @@ export const icd10Handlers = [
     const url = new URL(request.url);
     const query = url.searchParams.get('query') || '';
     const queryLower = query.toLowerCase();
-    const results = mockICD10Codes.filter(c =>
-      c.code.toLowerCase().includes(queryLower) ||
-      c.description.toLowerCase().includes(queryLower)
-    ).slice(0, 20);
+    const results = mockICD10Codes
+      .filter(
+        (c) =>
+          c.code.toLowerCase().includes(queryLower) ||
+          c.description.toLowerCase().includes(queryLower)
+      )
+      .slice(0, 20);
     return HttpResponse.json({
       data: results,
       timestamp: new Date().toISOString(),
@@ -586,7 +696,7 @@ export const icd10Handlers = [
 
   http.get('/api/icd10/categories', async () => {
     await delay(getRealisticDelay());
-    const categories = [...new Set(mockICD10Codes.map(c => c.category))];
+    const categories = [...new Set(mockICD10Codes.map((c) => c.category))];
     return HttpResponse.json({
       data: categories,
       timestamp: new Date().toISOString(),

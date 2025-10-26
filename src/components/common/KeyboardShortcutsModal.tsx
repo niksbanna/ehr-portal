@@ -14,14 +14,14 @@ const KeyboardShortcutsModal = ({ isOpen, onClose, shortcuts }: KeyboardShortcut
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       role="dialog"
       aria-modal="true"
       aria-labelledby="shortcuts-title"
       onClick={onClose}
     >
-      <div 
+      <div
         className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-auto"
         onClick={(e) => e.stopPropagation()}
       >
@@ -51,7 +51,7 @@ const KeyboardShortcutsModal = ({ isOpen, onClose, shortcuts }: KeyboardShortcut
             </thead>
             <tbody>
               {shortcuts.map((shortcut, index) => (
-                <tr 
+                <tr
                   key={index}
                   className="border-b border-gray-100 dark:border-gray-700 last:border-0"
                 >

@@ -2,7 +2,14 @@
  * Prescription and Drugs API Schema
  */
 
-import { ApiResponse, PaginatedResponse, Endpoint, PaginationParams, SortParams, FilterParams } from './common';
+import {
+  ApiResponse,
+  PaginatedResponse,
+  Endpoint,
+  PaginationParams,
+  SortParams,
+  FilterParams,
+} from './common';
 import { Prescription } from '../../types/index';
 
 // Request/Response Types
@@ -19,7 +26,10 @@ export interface PrescriptionFilterParams extends FilterParams {
   dateTo?: string;
 }
 
-export interface GetPrescriptionsParams extends PaginationParams, SortParams, PrescriptionFilterParams {}
+export interface GetPrescriptionsParams
+  extends PaginationParams,
+    SortParams,
+    PrescriptionFilterParams {}
 
 export interface Drug {
   id: string;
