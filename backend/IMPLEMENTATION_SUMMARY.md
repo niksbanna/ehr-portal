@@ -110,7 +110,7 @@ All endpoints support:
 
 1. **Loose FHIR Compliance**: Uses FHIR concepts but adapted for practical use
 2. **Backward Compatibility**: Input DTOs unchanged, only responses transformed
-3. **Type Safety**: Uses `any` in mappers to handle optional includes gracefully
+3. **Type Safety**: Uses `any` in mappers to handle optional includes from Prisma (patient, doctor, orderedBy relations). This is a pragmatic choice since Prisma's include types are complex and the entities don't reflect the included relations by default. A future improvement could use Prisma's generated types with includes.
 4. **Indian Context**: Maintains AADHAAR, INR currency, ICD-10 codes
 5. **Metadata First**: Every response includes metadata for consistency
 

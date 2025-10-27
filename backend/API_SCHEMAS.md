@@ -85,8 +85,10 @@ Query Parameters:
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 10)
 - `search` (optional): Search in firstName, lastName, email, phone
-- `sortBy` (optional): Field to sort by (e.g., firstName, lastName, createdAt)
+- `sortBy` (optional): Database field to sort by (e.g., firstName, lastName, createdAt, updatedAt)
 - `order` (optional): Sort order - `asc` or `desc` (default: desc)
+
+**Note**: Sorting is performed on the underlying database fields, not on the transformed FHIR structure. Valid sort fields include: firstName, lastName, email, phone, city, state, dateOfBirth, registrationDate, createdAt, updatedAt.
 
 Response: FHIR Patient resource with:
 - `resourceType`: "Patient"
@@ -116,8 +118,10 @@ Query Parameters:
 - `page`, `limit`, `search` (as above)
 - `patientId` (optional): Filter by patient ID
 - `status` (optional): Filter by status (SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED)
-- `sortBy` (optional): Field to sort by (e.g., date, status)
+- `sortBy` (optional): Database field to sort by (e.g., date, status, createdAt)
 - `order` (optional): Sort order
+
+**Note**: Valid sort fields include: date, status, type, createdAt, updatedAt.
 
 Response: FHIR Encounter resource with:
 - `resourceType`: "Encounter"
@@ -154,8 +158,10 @@ Query Parameters:
 - `page`, `limit` (as above)
 - `patientId` (optional): Filter by patient ID
 - `status` (optional): Filter by status (PENDING, IN_PROGRESS, COMPLETED)
-- `sortBy` (optional): Field to sort by (e.g., orderedDate, status)
+- `sortBy` (optional): Database field to sort by (e.g., orderedDate, reportDate, status, testName)
 - `order` (optional): Sort order
+
+**Note**: Valid sort fields include: orderedDate, reportDate, status, testName, testCategory, createdAt, updatedAt.
 
 Response: FHIR Observation resource with:
 - `resourceType`: "Observation"
@@ -197,8 +203,10 @@ Query Parameters:
 - `page`, `limit` (as above)
 - `patientId` (optional): Filter by patient ID
 - `status` (optional): Filter by payment status (PENDING, PAID, CANCELLED)
-- `sortBy` (optional): Field to sort by (e.g., date, total)
+- `sortBy` (optional): Database field to sort by (e.g., date, total, paymentStatus)
 - `order` (optional): Sort order
+
+**Note**: Valid sort fields include: date, total, subtotal, tax, paymentStatus, paymentMethod, createdAt, updatedAt.
 
 Response: FHIR Invoice resource with:
 - `resourceType`: "Invoice"
