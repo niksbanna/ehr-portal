@@ -67,11 +67,196 @@ A comprehensive Electronic Health Records (EHR) web application built with React
 
 ## Getting Started
 
+This application supports two modes of operation:
+
+1. **Mock API Mode** - Uses Mock Service Worker (MSW) for development without a backend
+2. **Real Backend Mode** - Connects to the NestJS backend with PostgreSQL database
+
 ### Prerequisites
 
 - Node.js 18+ 
 - npm or yarn
-- PostgreSQL 16+ (for backend, or use Docker)
+- PostgreSQL 16+ (only for real backend mode, or use Docker)
+
+## Quick Start Guide
+
+### Option 1: Frontend Only (Mock API Mode)
+
+Perfect for frontend development and testing without setting up the backend.
+
+**1. Clone the repository:**
+
+```bash
+git clone https://github.com/niksbanna/ehr-portal.git
+cd ehr-portal
+```
+
+**2. Install dependencies:**
+
+```bash
+npm install
+```
+
+**3. Set up environment for mock mode:**
+
+```bash
+cp .env.mock .env
+```
+
+**4. Start the development server:**
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+**Demo Credentials (Mock Mode):**
+- Email: `admin@hospital.in`
+- Password: any password (authentication is mocked)
+
+### Option 2: Full Stack (Frontend + Backend)
+
+For complete functionality with real database persistence.
+
+#### Step 1: Backend Setup
+
+**1. Navigate to backend directory:**
+
+```bash
+cd backend
+```
+
+**2. Install dependencies:**
+
+```bash
+npm install
+```
+
+**3. Set up environment variables:**
+
+```bash
+cp .env.example .env
+```
+
+Edit `backend/.env` if needed. Default configuration:
+- Database: PostgreSQL on `localhost:5432`
+- Backend Port: `3000`
+- CORS: Allows `http://localhost:5173`
+
+**4. Start PostgreSQL with Docker:**
+
+```bash
+docker-compose up -d
+```
+
+Or install PostgreSQL locally and ensure it's running.
+
+**5. Run database migrations:**
+
+```bash
+npm run prisma:migrate
+```
+
+**6. Seed the database:**
+
+```bash
+npm run prisma:seed
+```
+
+**7. Start the backend server:**
+
+```bash
+npm run start:dev
+```
+
+Backend will be available at `http://localhost:3000`
+- API Docs: `http://localhost:3000/api/docs`
+
+#### Step 2: Frontend Setup
+
+**1. Return to root directory:**
+
+```bash
+cd ..
+```
+
+**2. Install dependencies (if not already done):**
+
+```bash
+npm install
+```
+
+**3. Set up environment for backend mode:**
+
+```bash
+cp .env.backend .env
+```
+
+**4. Start the frontend server:**
+
+```bash
+npm run dev
+```
+
+Frontend will be available at `http://localhost:5173`
+
+**Demo Credentials (Real Backend):**
+- Admin: `admin@hospital.in` / `password123`
+- Doctor: `doctor@hospital.in` / `password123`
+- Nurse: `nurse@hospital.in` / `password123`
+
+### Switching Between Mock and Real Backend
+
+Edit `.env` file and change:
+
+**For Mock API:**
+```env
+VITE_ENABLE_MSW=true
+VITE_API_BASE_URL=
+```
+
+**For Real Backend:**
+```env
+VITE_ENABLE_MSW=false
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Then restart the development server (`npm run dev`).
+
+## Environment Configuration
+
+### Frontend Environment Variables
+
+Key variables in `.env`:
+
+- `VITE_API_BASE_URL` - Backend API URL (empty for mock mode, `http://localhost:3000` for real backend)
+- `VITE_ENABLE_MSW` - Enable/disable Mock Service Worker (`true` or `false`)
+- `VITE_AUTH_TOKEN_KEY` - LocalStorage key for auth token
+
+### Backend Environment Variables
+
+Key variables in `backend/.env`:
+
+- `DATABASE_URL` - PostgreSQL connection string
+- `PORT` - Backend server port (default: 3000)
+- `CORS_ORIGIN` - Allowed frontend origin (default: `http://localhost:5173`)
+- `JWT_SECRET` - Secret for JWT token signing
+
+## Running Both Services Together
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+npm run start:dev
+```
+
+**Terminal 2 - Frontend:**
+```bash
+npm run dev
+```
+
+Access the application at `http://localhost:5173`
 
 ### Frontend Setup
 
@@ -89,10 +274,12 @@ npm install
 3. **Set up environment variables:**
 
 ```bash
-cp .env.example .env
-```
+# For mock mode (no backend required)
+cp .env.mock .env
 
-Edit `.env` file to configure your environment (see [Environment Variables](#environment-variables) section).
+# OR for real backend mode
+cp .env.backend .env
+```
 
 4. **Start the development server:**
 
