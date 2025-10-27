@@ -3,7 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import * as fs from 'fs';
+import { promises as fs } from 'fs';
 import * as path from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
@@ -50,18 +50,16 @@ async function bootstrap() {
 
     const document = SwaggerModule.createDocument(app, config);
     
-    // Setup Swagger UI
-    SwaggerModule.setup(configService.get('swagger.path'), app, document);
-    
-    // Setup OpenAPI JSON endpoint for frontend sync
-    SwaggerModule.setup('api/docs-json', app, document, {
-      jsonDocumentUrl: 'api/docs-json',
+    // Setup Swagger UI at /api/docs
+    SwaggerModule.setup(configService.get('swagger.path'), app, document, {
+      jsonDocumentUrl: 'docs-json',
     });
     
-    // Export OpenAPI JSON to file for static access
+    // Export OpenAPI JSON to file for static access (async to avoid blocking)
     const outputPath = path.join(process.cwd(), 'openapi.json');
-    fs.writeFileSync(outputPath, JSON.stringify(document, null, 2));
-    console.log(`OpenAPI spec exported to: ${outputPath}`);
+    fs.writeFile(outputPath, JSON.stringify(document, null, 2))
+      .then(() => console.log(`OpenAPI spec exported to: ${outputPath}`))
+      .catch((err) => console.error('Failed to export OpenAPI spec:', err));
   }
 
   const port = configService.get('port');
@@ -69,6 +67,9 @@ async function bootstrap() {
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(
     `Swagger documentation: http://localhost:${port}/${configService.get('swagger.path')}`,
+  );
+  console.log(
+    `OpenAPI JSON: http://localhost:${port}/${configService.get('swagger.path')}-json`,
   );
 }
 
