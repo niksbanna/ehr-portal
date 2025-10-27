@@ -10,6 +10,7 @@ export class BillEntity implements PrismaBill {
   tax: number;
   discount: number;
   total: number;
+  currency: string;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
   notes: string | null;

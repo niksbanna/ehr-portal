@@ -5,6 +5,8 @@ export enum PaymentMethod {
   CASH = 'CASH',
   CARD = 'CARD',
   UPI = 'UPI',
+  NET_BANKING = 'NET_BANKING',
+  CHEQUE = 'CHEQUE',
 }
 
 export enum PaymentStatus {
@@ -53,6 +55,11 @@ export class CreateBillDto {
   @IsNumber()
   @IsNotEmpty()
   total: number;
+
+  @ApiPropertyOptional({ default: 'INR' })
+  @IsString()
+  @IsOptional()
+  currency?: string;
 
   @ApiProperty({ enum: PaymentMethod })
   @IsEnum(PaymentMethod)
@@ -109,6 +116,11 @@ export class UpdateBillDto {
   @IsNumber()
   @IsOptional()
   total?: number;
+
+  @ApiPropertyOptional({ default: 'INR' })
+  @IsString()
+  @IsOptional()
+  currency?: string;
 
   @ApiPropertyOptional({ enum: PaymentMethod })
   @IsEnum(PaymentMethod)
