@@ -513,13 +513,13 @@ backend/src/modules/auth/
 
 ## Monitoring & Logging
 
-### Events to Log
-- ✅ User login attempts (success/failure)
-- ✅ Token refresh requests
-- ✅ Logout events
-- ✅ User registration (admin actions)
-- ✅ Failed authorization attempts
-- ✅ Token blacklist operations
+### Events to Log (Recommended)
+- User login attempts (success/failure)
+- Token refresh requests
+- Logout events
+- User registration (admin actions)
+- Failed authorization attempts
+- Token blacklist operations
 
 ### Metrics to Track
 - Login success rate
