@@ -10,9 +10,7 @@ export class BillMapper {
     const subject: ReferenceDto = {
       reference: `Patient/${bill.patientId}`,
       type: 'Patient',
-      display: bill.patient
-        ? `${bill.patient.firstName} ${bill.patient.lastName}`
-        : undefined,
+      display: bill.patient ? `${bill.patient.firstName} ${bill.patient.lastName}` : undefined,
     };
 
     const encounter: ReferenceDto | undefined = bill.encounterId

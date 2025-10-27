@@ -14,8 +14,22 @@ export class BillingService {
     return new ApiResponse(responseDto);
   }
 
-  async findAll(page = 1, limit = 10, patientId?: string, status?: string, sortBy?: string, order?: 'asc' | 'desc') {
-    const result = await this.billingRepository.findAll({ page, limit, patientId, status, sortBy, order });
+  async findAll(
+    page = 1,
+    limit = 10,
+    patientId?: string,
+    status?: string,
+    sortBy?: string,
+    order?: 'asc' | 'desc',
+  ) {
+    const result = await this.billingRepository.findAll({
+      page,
+      limit,
+      patientId,
+      status,
+      sortBy,
+      order,
+    });
     const responseDtos = BillMapper.toResponseDtoArray(result.data);
     return new PaginatedResponse(
       responseDtos,

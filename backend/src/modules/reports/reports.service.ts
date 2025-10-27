@@ -6,29 +6,24 @@ export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
   async getDashboardStats() {
-    const [
-      totalPatients,
-      totalEncounters,
-      pendingLabs,
-      totalRevenue,
-      todayEncounters,
-    ] = await Promise.all([
-      this.prisma.patient.count(),
-      this.prisma.encounter.count(),
-      this.prisma.labResult.count({ where: { status: 'PENDING' } }),
-      this.prisma.bill.aggregate({
-        _sum: { total: true },
-        where: { paymentStatus: 'PAID' },
-      }),
-      this.prisma.encounter.count({
-        where: {
-          date: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-            lte: new Date(new Date().setHours(23, 59, 59, 999)),
+    const [totalPatients, totalEncounters, pendingLabs, totalRevenue, todayEncounters] =
+      await Promise.all([
+        this.prisma.patient.count(),
+        this.prisma.encounter.count(),
+        this.prisma.labResult.count({ where: { status: 'PENDING' } }),
+        this.prisma.bill.aggregate({
+          _sum: { total: true },
+          where: { paymentStatus: 'PAID' },
+        }),
+        this.prisma.encounter.count({
+          where: {
+            date: {
+              gte: new Date(new Date().setHours(0, 0, 0, 0)),
+              lte: new Date(new Date().setHours(23, 59, 59, 999)),
+            },
           },
-        },
-      }),
-    ]);
+        }),
+      ]);
 
     return {
       totalPatients,
@@ -41,7 +36,7 @@ export class ReportsService {
 
   async getPatientReport(startDate?: string, endDate?: string) {
     const where: any = {};
-    
+
     if (startDate || endDate) {
       where.registrationDate = {};
       if (startDate) where.registrationDate.gte = startDate;
@@ -70,7 +65,7 @@ export class ReportsService {
 
   async getRevenueReport(startDate?: string, endDate?: string) {
     const where: any = { paymentStatus: 'PAID' };
-    
+
     if (startDate || endDate) {
       where.date = {};
       if (startDate) where.date.gte = new Date(startDate);
@@ -101,9 +96,9 @@ export class ReportsService {
 
   async getLabReport(startDate?: string, endDate?: string, status?: string) {
     const where: any = {};
-    
+
     if (status) where.status = status;
-    
+
     if (startDate || endDate) {
       where.orderedDate = {};
       if (startDate) where.orderedDate.gte = new Date(startDate);
@@ -135,9 +130,9 @@ export class ReportsService {
 
   async getEncounterReport(startDate?: string, endDate?: string, type?: string) {
     const where: any = {};
-    
+
     if (type) where.type = type;
-    
+
     if (startDate || endDate) {
       where.date = {};
       if (startDate) where.date.gte = new Date(startDate);

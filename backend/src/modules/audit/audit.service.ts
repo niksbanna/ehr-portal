@@ -7,7 +7,16 @@ export class AuditService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: GetAuditLogsDto) {
-    const { userId, userRole, entity, action, status, page = 1, limit = 50, order = 'desc' } = query;
+    const {
+      userId,
+      userRole,
+      entity,
+      action,
+      status,
+      page = 1,
+      limit = 50,
+      order = 'desc',
+    } = query;
 
     // Build where clause
     const where: any = {};

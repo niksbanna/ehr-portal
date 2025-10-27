@@ -8,15 +8,15 @@
  */
 export function maskAadhaar(aadhaar: string): string {
   if (!aadhaar) return aadhaar;
-  
+
   // Remove any existing formatting
   const cleaned = aadhaar.replace(/[-\s]/g, '');
-  
+
   // If not a valid length, return masked
   if (cleaned.length !== 12) {
     return 'XXXX-XXXX-XXXX';
   }
-  
+
   // Show only last 4 digits
   const last4 = cleaned.slice(-4);
   return `XXXX-XXXX-${last4}`;
@@ -28,15 +28,15 @@ export function maskAadhaar(aadhaar: string): string {
  */
 export function maskPAN(pan: string): string {
   if (!pan) return pan;
-  
+
   // Remove any spaces
   const cleaned = pan.replace(/\s/g, '');
-  
+
   // If not a valid length (PAN is 10 chars), return masked
   if (cleaned.length !== 10) {
     return 'XXXXXX'.padEnd(cleaned.length, 'X');
   }
-  
+
   // Show only last 4 characters
   const last4 = cleaned.slice(-4);
   return 'XXXXXX' + last4;
@@ -51,7 +51,7 @@ export function maskSensitiveData(obj: any): any {
   }
 
   if (Array.isArray(obj)) {
-    return obj.map(item => maskSensitiveData(item));
+    return obj.map((item) => maskSensitiveData(item));
   }
 
   const masked = { ...obj };
@@ -60,7 +60,7 @@ export function maskSensitiveData(obj: any): any {
   for (const key in masked) {
     if (masked.hasOwnProperty(key)) {
       const lowerKey = key.toLowerCase();
-      
+
       if (lowerKey === 'aadhaar') {
         masked[key] = maskAadhaar(masked[key]);
       } else if (lowerKey === 'pan' || lowerKey === 'pannumber') {

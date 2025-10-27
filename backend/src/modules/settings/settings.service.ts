@@ -37,7 +37,7 @@ export class SettingsService {
     // Try cache first
     const cacheKey = `settings:key:${key}`;
     const cached = await this.cacheManager.get(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
@@ -58,7 +58,7 @@ export class SettingsService {
     // Try cache first for frequently accessed categories
     const cacheKey = `settings:category:${category}`;
     const cached = await this.cacheManager.get(cacheKey);
-    
+
     if (cached) {
       return cached;
     }

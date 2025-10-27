@@ -45,7 +45,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         status = this.handlePrismaError(prismaError);
         message = this.getPrismaErrorMessage(prismaError);
         error = 'Database Error';
-      } 
+      }
       // Handle validation errors
       else if (exception.name === 'ValidationError') {
         status = HttpStatus.BAD_REQUEST;
@@ -77,12 +77,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       );
     }
 
-    const errorResponse = new ErrorResponse(
-      status,
-      message,
-      error,
-      request.url,
-    );
+    const errorResponse = new ErrorResponse(status, message, error, request.url);
 
     response.status(status).json(errorResponse);
   }

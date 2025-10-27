@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
-} from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { UserRole } from '@prisma/client';
@@ -20,13 +15,13 @@ export class AuditLogInterceptor implements NestInterceptor {
 
     // Only log mutations (POST, PATCH, PUT, DELETE)
     const isMutation = ['POST', 'PATCH', 'PUT', 'DELETE'].includes(method);
-    
+
     if (!isMutation) {
       return next.handle();
     }
 
     // Extract IP address
-    const ipAddress = 
+    const ipAddress =
       request.headers['x-forwarded-for']?.split(',')[0] ||
       request.headers['x-real-ip'] ||
       request.connection?.remoteAddress ||
@@ -82,7 +77,10 @@ export class AuditLogInterceptor implements NestInterceptor {
     );
   }
 
-  private extractEntityInfo(url: string, method: string): {
+  private extractEntityInfo(
+    url: string,
+    method: string,
+  ): {
     entity: string;
     entityId: string | null;
     action: string;
@@ -99,12 +97,12 @@ export class AuditLogInterceptor implements NestInterceptor {
     if (segments.length > 0) {
       // First segment is usually the entity (e.g., 'patients', 'encounters')
       entity = segments[0].charAt(0).toUpperCase() + segments[0].slice(1).replace(/-/g, '');
-      
+
       // If there's a second segment and it looks like an ID (UUID or number), it's the entityId
       if (segments.length > 1 && this.looksLikeId(segments[1])) {
         entityId = segments[1];
       }
-      
+
       // Map HTTP methods to actions
       if (method === 'POST') {
         action = 'CREATE';
