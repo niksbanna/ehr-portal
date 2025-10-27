@@ -10,11 +10,74 @@ const prisma = new PrismaClient();
 
 // Helper function to generate random Indian names
 const firstNames = {
-  male: ['Rajesh', 'Amit', 'Suresh', 'Vikram', 'Anil', 'Rahul', 'Sanjay', 'Deepak', 'Arjun', 'Karan', 'Rohan', 'Nikhil', 'Akash', 'Vishal', 'Pradeep', 'Manish', 'Pankaj', 'Santosh', 'Ravi', 'Ashok'],
-  female: ['Priya', 'Sunita', 'Anjali', 'Kavita', 'Neha', 'Pooja', 'Rekha', 'Sangeeta', 'Divya', 'Meera', 'Sneha', 'Jyoti', 'Shalini', 'Ritu', 'Anita', 'Swati', 'Nisha', 'Sapna', 'Geeta', 'Preeti'],
+  male: [
+    'Rajesh',
+    'Amit',
+    'Suresh',
+    'Vikram',
+    'Anil',
+    'Rahul',
+    'Sanjay',
+    'Deepak',
+    'Arjun',
+    'Karan',
+    'Rohan',
+    'Nikhil',
+    'Akash',
+    'Vishal',
+    'Pradeep',
+    'Manish',
+    'Pankaj',
+    'Santosh',
+    'Ravi',
+    'Ashok',
+  ],
+  female: [
+    'Priya',
+    'Sunita',
+    'Anjali',
+    'Kavita',
+    'Neha',
+    'Pooja',
+    'Rekha',
+    'Sangeeta',
+    'Divya',
+    'Meera',
+    'Sneha',
+    'Jyoti',
+    'Shalini',
+    'Ritu',
+    'Anita',
+    'Swati',
+    'Nisha',
+    'Sapna',
+    'Geeta',
+    'Preeti',
+  ],
 };
 
-const lastNames = ['Sharma', 'Patel', 'Kumar', 'Singh', 'Gupta', 'Reddy', 'Verma', 'Agarwal', 'Jain', 'Mehta', 'Nair', 'Iyer', 'Rao', 'Desai', 'Malhotra', 'Chopra', 'Bhat', 'Menon', 'Pillai', 'Kaur'];
+const lastNames = [
+  'Sharma',
+  'Patel',
+  'Kumar',
+  'Singh',
+  'Gupta',
+  'Reddy',
+  'Verma',
+  'Agarwal',
+  'Jain',
+  'Mehta',
+  'Nair',
+  'Iyer',
+  'Rao',
+  'Desai',
+  'Malhotra',
+  'Chopra',
+  'Bhat',
+  'Menon',
+  'Pillai',
+  'Kaur',
+];
 
 const cities = [
   { city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
@@ -30,7 +93,15 @@ const cities = [
 ];
 
 const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
-const commonAllergies = ['None', 'Penicillin', 'Dust', 'Pollen', 'Peanuts', 'Sulfa drugs', 'Aspirin'];
+const commonAllergies = [
+  'None',
+  'Penicillin',
+  'Dust',
+  'Pollen',
+  'Peanuts',
+  'Sulfa drugs',
+  'Aspirin',
+];
 const medicalConditions = [
   'Diabetes Type 2',
   'Hypertension',
@@ -169,7 +240,14 @@ async function main() {
       name: 'DOCTOR',
       displayName: 'Medical Doctor',
       description: 'Can manage patients, encounters, prescriptions',
-      permissions: ['patient:read', 'patient:write', 'encounter:read', 'encounter:write', 'prescription:read', 'prescription:write'],
+      permissions: [
+        'patient:read',
+        'patient:write',
+        'encounter:read',
+        'encounter:write',
+        'prescription:read',
+        'prescription:write',
+      ],
     },
   });
 
@@ -185,7 +263,7 @@ async function main() {
     const firstName = firstNames[genderKey][i % firstNames[genderKey].length];
     const lastName = lastNames[i % lastNames.length];
     const location = cities[i % cities.length];
-    
+
     const patient = await prisma.patient.create({
       data: {
         firstName,
@@ -213,7 +291,11 @@ async function main() {
   console.log(`Created ${patients.length} patients`);
 
   // Create encounters for some patients
-  const encounterTypes = ['CONSULTATION', 'FOLLOWUP', 'EMERGENCY'];
+  const encounterTypes: ('CONSULTATION' | 'FOLLOWUP' | 'EMERGENCY')[] = [
+    'CONSULTATION',
+    'FOLLOWUP',
+    'EMERGENCY',
+  ];
   const chiefComplaints = [
     'Fever and body ache',
     'Chest pain',
@@ -251,7 +333,7 @@ async function main() {
         patientId: patient.id,
         doctorId: doctor.id,
         date: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-        type: encounterType as any,
+        type: encounterType,
         chiefComplaint: complaint,
         diagnosis: diagnosis,
         diagnosisCode: `E${10 + i}.${i % 10}`,
@@ -290,12 +372,30 @@ async function main() {
     // Create lab results for some encounters
     if (i % 3 === 0) {
       const tests = [
-        { name: 'Complete Blood Count', category: 'Hematology', result: 'Normal', range: 'WBC: 4-11, RBC: 4.5-5.5', unit: '10^9/L' },
+        {
+          name: 'Complete Blood Count',
+          category: 'Hematology',
+          result: 'Normal',
+          range: 'WBC: 4-11, RBC: 4.5-5.5',
+          unit: '10^9/L',
+        },
         { name: 'HbA1c', category: 'Blood Test', result: '7.2', range: '4.0-5.6', unit: '%' },
-        { name: 'Lipid Profile', category: 'Blood Test', result: 'Total Cholesterol: 210', range: '<200', unit: 'mg/dL' },
-        { name: 'Liver Function Test', category: 'Blood Test', result: 'Normal', range: 'ALT: 7-56, AST: 10-40', unit: 'U/L' },
+        {
+          name: 'Lipid Profile',
+          category: 'Blood Test',
+          result: 'Total Cholesterol: 210',
+          range: '<200',
+          unit: 'mg/dL',
+        },
+        {
+          name: 'Liver Function Test',
+          category: 'Blood Test',
+          result: 'Normal',
+          range: 'ALT: 7-56, AST: 10-40',
+          unit: 'U/L',
+        },
       ];
-      
+
       const test = tests[i % tests.length];
       await prisma.labResult.create({
         data: {
@@ -318,15 +418,53 @@ async function main() {
     // Create medications for some encounters
     if (i % 2 === 0) {
       const medications = [
-        { name: 'Metformin', generic: 'Metformin HCl', dosage: '500mg', form: 'Tablet', route: 'Oral', frequency: 'Twice daily', duration: '30 days', price: 5 },
-        { name: 'Paracetamol', generic: 'Acetaminophen', dosage: '500mg', form: 'Tablet', route: 'Oral', frequency: 'Three times daily', duration: '5 days', price: 2 },
-        { name: 'Amoxicillin', generic: 'Amoxicillin', dosage: '500mg', form: 'Capsule', route: 'Oral', frequency: 'Three times daily', duration: '7 days', price: 10 },
-        { name: 'Amlodipine', generic: 'Amlodipine Besylate', dosage: '5mg', form: 'Tablet', route: 'Oral', frequency: 'Once daily', duration: '30 days', price: 8 },
+        {
+          name: 'Metformin',
+          generic: 'Metformin HCl',
+          dosage: '500mg',
+          form: 'Tablet',
+          route: 'Oral',
+          frequency: 'Twice daily',
+          duration: '30 days',
+          price: 5,
+        },
+        {
+          name: 'Paracetamol',
+          generic: 'Acetaminophen',
+          dosage: '500mg',
+          form: 'Tablet',
+          route: 'Oral',
+          frequency: 'Three times daily',
+          duration: '5 days',
+          price: 2,
+        },
+        {
+          name: 'Amoxicillin',
+          generic: 'Amoxicillin',
+          dosage: '500mg',
+          form: 'Capsule',
+          route: 'Oral',
+          frequency: 'Three times daily',
+          duration: '7 days',
+          price: 10,
+        },
+        {
+          name: 'Amlodipine',
+          generic: 'Amlodipine Besylate',
+          dosage: '5mg',
+          form: 'Tablet',
+          route: 'Oral',
+          frequency: 'Once daily',
+          duration: '30 days',
+          price: 8,
+        },
       ];
 
       const med = medications[i % medications.length];
-      const quantity = parseInt(med.duration) * (med.frequency.includes('Twice') ? 2 : med.frequency.includes('Three') ? 3 : 1);
-      
+      const quantity =
+        parseInt(med.duration) *
+        (med.frequency.includes('Twice') ? 2 : med.frequency.includes('Three') ? 3 : 1);
+
       await prisma.medication.create({
         data: {
           patientId: patient.id,
@@ -376,7 +514,8 @@ async function main() {
     }
 
     // Create bills
-    const consultationFee = encounterType === 'EMERGENCY' ? 1000 : encounterType === 'FOLLOWUP' ? 300 : 500;
+    const consultationFee =
+      encounterType === 'EMERGENCY' ? 1000 : encounterType === 'FOLLOWUP' ? 300 : 500;
     const items = [
       { name: 'Consultation Fee', quantity: 1, rate: consultationFee, amount: consultationFee },
     ];
@@ -407,7 +546,9 @@ async function main() {
     });
   }
 
-  console.log('Created encounters, observations, lab results, medications, prescriptions, and bills');
+  console.log(
+    'Created encounters, observations, lab results, medications, prescriptions, and bills'
+  );
 
   // Create audit logs
   await prisma.auditLog.create({
