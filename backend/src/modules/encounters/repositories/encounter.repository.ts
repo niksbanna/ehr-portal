@@ -26,10 +26,14 @@ export class EncounterRepository implements IRepository<EncounterEntity> {
     limit?: number;
     patientId?: string;
     status?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
   }): Promise<{ data: EncounterEntity[]; pagination: any }> {
     const page = options?.page || 1;
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
+    const sortBy = options?.sortBy || 'date';
+    const order = options?.order || 'desc';
 
     const where: any = {};
     if (options?.patientId) where.patientId = options.patientId;
@@ -40,7 +44,7 @@ export class EncounterRepository implements IRepository<EncounterEntity> {
         where,
         skip,
         take: limit,
-        orderBy: { date: 'desc' },
+        orderBy: { [sortBy]: order },
         include: {
           patient: true,
           doctor: true,

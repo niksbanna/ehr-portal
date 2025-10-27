@@ -27,10 +27,14 @@ export class LabRepository implements IRepository<LabResultEntity> {
     limit?: number;
     patientId?: string;
     status?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
   }): Promise<{ data: LabResultEntity[]; pagination: any }> {
     const page = options?.page || 1;
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
+    const sortBy = options?.sortBy || 'orderedDate';
+    const order = options?.order || 'desc';
 
     const where: any = {};
     if (options?.patientId) where.patientId = options.patientId;
@@ -41,7 +45,7 @@ export class LabRepository implements IRepository<LabResultEntity> {
         where,
         skip,
         take: limit,
-        orderBy: { orderedDate: 'desc' },
+        orderBy: { [sortBy]: order },
         include: {
           patient: true,
           orderedBy: true,
