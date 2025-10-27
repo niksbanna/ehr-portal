@@ -1,0 +1,149 @@
+.
+├── backend
+│   ├── prisma
+│   │   ├── migrations
+│   │   ├── SCHEMA_DOCUMENTATION.md
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   ├── src
+│   │   ├── common
+│   │   ├── config
+│   │   ├── modules
+│   │   ├── app.module.ts
+│   │   └── main.ts
+│   ├── test
+│   │   ├── integration
+│   │   ├── utils
+│   │   └── setup.ts
+│   ├── API_RESPONSE_EXAMPLES.md
+│   ├── API_SCHEMAS.md
+│   ├── AUDIT_IMPLEMENTATION_SUMMARY.md
+│   ├── AUDIT_LOGGING.md
+│   ├── AUTHENTICATION_ARCHITECTURE.md
+│   ├── AUTHENTICATION_SUMMARY.md
+│   ├── AUTH_DOCUMENTATION.md
+│   ├── Dockerfile
+│   ├── IMPLEMENTATION_COMPLETE.md
+│   ├── IMPLEMENTATION_SUMMARY.md
+│   ├── PERFORMANCE_ENHANCEMENTS.md
+│   ├── PR_SUMMARY.md
+│   ├── README.md
+│   ├── docker-compose.yml
+│   ├── jest.config.js
+│   ├── nest-cli.json
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── test-performance.sh
+│   ├── tsconfig.json
+│   └── verify-audit-logging.sh
+├── docs
+│   ├── ARCHITECTURE.md
+│   ├── CONTRIBUTING.md
+│   ├── DEPLOYMENT.md
+│   ├── DOCKER.md
+│   ├── ENVIRONMENT.md
+│   ├── README.md
+│   └── SETUP.md
+├── e2e
+│   └── app.spec.ts
+├── public
+│   ├── manifest.json
+│   ├── mockServiceWorker.js
+│   └── vite.svg
+├── src
+│   ├── api
+│   │   ├── hooks
+│   │   ├── mocks
+│   │   ├── schema
+│   │   └── index.ts
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── common
+│   │   ├── layout
+│   │   └── PageSkeleton.tsx
+│   ├── config
+│   │   └── api.config.ts
+│   ├── contexts
+│   │   ├── I18nContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── data
+│   │   └── icd10-codes.json
+│   ├── hooks
+│   │   ├── useAuth.tsx
+│   │   ├── useI18n.ts
+│   │   ├── useKeyboardShortcuts.ts
+│   │   ├── useOptimisticUpdate.ts
+│   │   └── useTheme.ts
+│   ├── i18n
+│   │   └── translations.ts
+│   ├── mocks -> api/mocks
+│   ├── pages
+│   │   ├── AuditLogPage.tsx
+│   │   ├── BillingPage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   ├── EncountersPage.tsx
+│   │   ├── LabsPage.tsx
+│   │   ├── LoginPage.tsx
+│   │   ├── PatientChartPage.tsx
+│   │   ├── PatientSearchPage.tsx
+│   │   ├── PatientsPage.tsx
+│   │   ├── PrescriptionsPage.tsx
+│   │   ├── ReportsPage.tsx
+│   │   └── SettingsPage.tsx
+│   ├── routes
+│   │   └── index.tsx
+│   ├── schemas
+│   │   ├── fhir.schema.ts
+│   │   └── patient-form.schema.ts
+│   ├── services
+│   │   ├── api.ts
+│   │   └── auditLogger.ts
+│   ├── stores
+│   │   └── index.ts
+│   ├── test
+│   │   ├── App.test.tsx
+│   │   ├── PageSkeleton.test.tsx
+│   │   ├── auditLogger.test.ts
+│   │   ├── sanitize.test.ts
+│   │   ├── setup.ts
+│   │   └── useOptimisticUpdate.test.tsx
+│   ├── tests -> test
+│   ├── types
+│   │   └── index.ts
+│   ├── utils
+│   │   ├── accessibility.ts
+│   │   ├── duplicate-detection.ts
+│   │   ├── permissions.ts
+│   │   └── sanitize.ts
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── API_DOCUMENTATION.md
+├── BACKEND_INTEGRATION.md
+├── BACKEND_SUMMARY.md
+├── Dockerfile
+├── FHIR_IMPLEMENTATION.md
+├── IMPLEMENTATION_SUMMARY.md
+├── PERFORMANCE.md
+├── README.md
+├── REPO_TREE.txt
+├── SECURITY_ACCESSIBILITY.md
+├── SETUP_GUIDE.md
+├── docker-compose.yml
+├── eslint.config.js
+├── index.html
+├── nginx.conf
+├── package-lock.json
+├── package.json
+├── playwright.config.ts
+├── postcss.config.js
+├── tailwind.config.cjs
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+├── vite.config.ts
+└── vitest.config.ts
+
+38 directories, 109 files

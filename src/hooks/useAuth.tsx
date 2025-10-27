@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types/index';
 import { logAuditEvent } from '../services/auditLogger';
+import { AUTH_TOKEN_KEY, buildApiUrl } from '../config/api.config';
 
 interface AuthContextType {
   user: User | null;
@@ -25,17 +26,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const TokenStorage = {
   getToken(): string | null {
     // TODO: In production, token will be in HttpOnly cookie, not accessible here
-    return localStorage.getItem('auth_token');
+    return localStorage.getItem(AUTH_TOKEN_KEY);
   },
 
   setToken(token: string): void {
     // TODO: In production, this will be set by server as HttpOnly cookie
-    localStorage.setItem('auth_token', token);
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
   },
 
   removeToken(): void {
     // TODO: In production, clear cookie via server endpoint
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
   },
 
   getUser(): User | null {
@@ -73,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(buildApiUrl('/api/auth/login'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           details: `User logged out`,
         });
 
-        await fetch('/api/auth/logout', {
+        await fetch(buildApiUrl('/api/auth/logout'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
