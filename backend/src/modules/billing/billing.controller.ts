@@ -13,15 +13,19 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@ne
 import { BillingService } from './billing.service';
 import { CreateBillDto, UpdateBillDto } from './dto/bill.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Billing')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('billing')
 export class BillingController {
   constructor(private readonly billingService: BillingService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN, UserRole.BILLING, UserRole.RECEPTIONIST)
   @ApiOperation({ summary: 'Create a new bill' })
   @ApiResponse({ status: 201, description: 'Bill created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })

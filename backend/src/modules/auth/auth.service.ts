@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
 import { UserRepository } from './repositories/user.repository';
+import { TokenBlacklistService } from './services/token-blacklist.service';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +12,7 @@ export class AuthService {
     private userRepository: UserRepository,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private tokenBlacklistService: TokenBlacklistService,
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
@@ -79,5 +81,22 @@ export class AuthService {
     }
     const { password, ...result } = user;
     return result;
+  }
+
+  async logout(token: string) {
+    try {
+      const decoded = this.jwtService.decode(token) as any;
+      if (decoded && decoded.exp) {
+        const expiryTime = decoded.exp * 1000; // Convert to milliseconds
+        this.tokenBlacklistService.addToBlacklist(token, expiryTime);
+      }
+      return { message: 'Logout successful' };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  async isTokenBlacklisted(token: string): Promise<boolean> {
+    return this.tokenBlacklistService.isBlacklisted(token);
   }
 }

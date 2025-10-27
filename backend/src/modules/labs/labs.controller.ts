@@ -13,15 +13,19 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@ne
 import { LabsService } from './labs.service';
 import { CreateLabResultDto, UpdateLabResultDto } from './dto/lab.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Lab Results')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('labs')
 export class LabsController {
   constructor(private readonly labsService: LabsService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN, UserRole.DOCTOR, UserRole.LAB_TECH)
   @ApiOperation({ summary: 'Create a new lab result' })
   @ApiResponse({ status: 201, description: 'Lab result created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
