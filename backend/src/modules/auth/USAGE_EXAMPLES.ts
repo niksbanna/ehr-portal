@@ -1,8 +1,12 @@
 /**
  * Authentication System Usage Examples
  * 
- * This file demonstrates how to use the JWT authentication system
- * in the EHR Portal backend.
+ * ⚠️ IMPORTANT: This file contains EXAMPLE CODE for documentation purposes only.
+ * These are code snippets showing how to use the authentication system.
+ * This code is NOT executed in the application - it serves as a reference guide.
+ * 
+ * For actual implementation, see the controllers in the modules directory.
+ * Always use proper DTOs with class-validator for input validation in production.
  */
 
 // ============================================================================
@@ -94,6 +98,8 @@ export class UserInfoExampleController {
   createWithUser(@Request() req, @Body() data: any) {
     // Use current user's info when creating records
     const doctorId = req.user.userId;
+    // Note: In production, always validate and sanitize 'data' using DTOs
+    // and class-validator before using it
     return {
       ...data,
       createdBy: doctorId,
