@@ -1,4 +1,5 @@
 import { Patient, Encounter, LabResult, Prescription, Bill, DashboardStats, User } from '../types/index';
+import { AUTH_TOKEN_KEY } from '../config/api.config';
 
 // Mock user data with different roles
 const mockUsers: User[] = [
@@ -491,7 +492,7 @@ class MockAPI {
   }
 
   getCurrentUser(): User | null {
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) return null;
     
     if (this.currentUser) return this.currentUser;

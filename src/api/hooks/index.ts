@@ -29,17 +29,17 @@ import {
   UpdateLabResultRequest,
   CreatePrescriptionRequest,
 } from '../schema';
+import { buildApiUrl, getAuthHeaders } from '../../config/api.config';
 
 // API client functions
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
-  const token = localStorage.getItem('auth_token');
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...getAuthHeaders(),
     ...options?.headers,
   };
 
-  const response = await fetch(url, {
+  const response = await fetch(buildApiUrl(url), {
     ...options,
     headers,
   });
