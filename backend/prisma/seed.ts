@@ -3,6 +3,11 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+// NOTE: This seed script is for development/testing purposes only and generates DEMO data.
+// Math.random() is used here for convenience in generating fake data and is NOT used for
+// any security-sensitive operations. In production, real patient data would be entered
+// through the application with proper validation and security measures.
+
 // Helper function to generate random Indian names
 const firstNames = {
   male: ['Rajesh', 'Amit', 'Suresh', 'Vikram', 'Anil', 'Rahul', 'Sanjay', 'Deepak', 'Arjun', 'Karan', 'Rohan', 'Nikhil', 'Akash', 'Vishal', 'Pradeep', 'Manish', 'Pankaj', 'Santosh', 'Ravi', 'Ashok'],
