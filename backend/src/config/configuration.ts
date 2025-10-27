@@ -19,4 +19,14 @@ export default () => ({
     version: process.env.SWAGGER_VERSION || '1.0',
     path: process.env.SWAGGER_PATH || 'api/docs',
   },
+  redis: {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB, 10) || 0,
+  },
+  cache: {
+    ttl: parseInt(process.env.CACHE_TTL, 10) || 3600, // 1 hour in seconds
+    max: parseInt(process.env.CACHE_MAX, 10) || 100,
+  },
 });

@@ -33,6 +33,27 @@ export class SettingsController {
     return this.settingsService.findAll(pageNum, limitNum, category, isPublicBool);
   }
 
+  @Get('icd-codes')
+  @ApiOperation({ summary: 'Get all ICD-10 codes (cached)' })
+  @ApiResponse({ status: 200, description: 'Return all ICD-10 codes' })
+  getIcdCodes() {
+    return this.settingsService.findByCategory('icd-10-codes');
+  }
+
+  @Get('departments')
+  @ApiOperation({ summary: 'Get all departments (cached)' })
+  @ApiResponse({ status: 200, description: 'Return all departments' })
+  getDepartments() {
+    return this.settingsService.findByCategory('departments');
+  }
+
+  @Get('drugs')
+  @ApiOperation({ summary: 'Get all drugs list (cached)' })
+  @ApiResponse({ status: 200, description: 'Return all drugs in the formulary' })
+  getDrugs() {
+    return this.settingsService.findByCategory('drugs');
+  }
+
   @Get('key/:key')
   @ApiOperation({ summary: 'Get setting by key' })
   @ApiResponse({ status: 200, description: 'Return setting by key' })
