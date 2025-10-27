@@ -184,9 +184,11 @@ The audit logging is automatically applied to all mutation endpoints. To test:
 
 ### Log Retention
 Consider implementing log retention policies to prevent unbounded growth:
-- Archive old logs to cold storage
-- Delete logs older than regulatory retention period
-- Monitor database size
+- Archive old logs to cold storage after 1 year
+- For healthcare/EHR systems, retain audit logs for at least 7-10 years to comply with regulatory requirements (HIPAA, etc.)
+- Consider separate archival storage for logs older than 2 years
+- Delete only after legal/regulatory retention period expires
+- Monitor database size and implement automated archival processes
 
 ### Performance
 The audit logging uses asynchronous logging to minimize performance impact. If needed:
