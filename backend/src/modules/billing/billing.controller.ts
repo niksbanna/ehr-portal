@@ -39,7 +39,12 @@ export class BillingController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'patientId', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
-  @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Field to sort by (e.g., date, total)' })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    type: String,
+    description: 'Field to sort by (e.g., date, total)',
+  })
   @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Sort order' })
   @ApiResponse({ status: 200, description: 'Bills retrieved successfully' })
   findAll(

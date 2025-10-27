@@ -63,7 +63,10 @@ export class ParticipantDto {
   @ApiProperty({ description: 'Person participating in the encounter', type: ReferenceDto })
   individual: ReferenceDto;
 
-  @ApiPropertyOptional({ description: 'Period of time during the encounter participant was present', type: PeriodDto })
+  @ApiPropertyOptional({
+    description: 'Period of time during the encounter participant was present',
+    type: PeriodDto,
+  })
   period?: PeriodDto;
 }
 
@@ -137,7 +140,10 @@ export class EncounterResponseDto {
   @ApiPropertyOptional({ description: 'Identifier for the encounter' })
   identifier?: string;
 
-  @ApiProperty({ description: 'Status of the encounter', enum: ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'] })
+  @ApiProperty({
+    description: 'Status of the encounter',
+    enum: ['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+  })
   status: string;
 
   @ApiProperty({ description: 'Classification of encounter', type: CodeableConceptDto })
@@ -158,7 +164,10 @@ export class EncounterResponseDto {
   @ApiPropertyOptional({ description: 'Reason for encounter' })
   reasonCode?: CodeableConceptDto[];
 
-  @ApiPropertyOptional({ description: 'List of diagnosis relevant to this encounter', type: [DiagnosisDto] })
+  @ApiPropertyOptional({
+    description: 'List of diagnosis relevant to this encounter',
+    type: [DiagnosisDto],
+  })
   diagnosis?: DiagnosisDto[];
 
   @ApiProperty({ description: 'Chief complaint' })
@@ -167,7 +176,10 @@ export class EncounterResponseDto {
   @ApiPropertyOptional({ description: 'Clinical notes' })
   notes?: string;
 
-  @ApiPropertyOptional({ description: 'Vital signs recorded during encounter', type: VitalSignsDto })
+  @ApiPropertyOptional({
+    description: 'Vital signs recorded during encounter',
+    type: VitalSignsDto,
+  })
   vitalSigns?: VitalSignsDto;
 
   @ApiPropertyOptional({ description: 'SOAP notes', type: SOAPNotesDto })

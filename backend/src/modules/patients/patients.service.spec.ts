@@ -120,7 +120,8 @@ describe('PatientsService', () => {
         order: undefined,
       });
       expect(result.data).toHaveLength(2);
-      expect(result.pagination).toBeDefined();
+      expect(result.meta.pagination).toBeDefined();
+      expect(result.meta.pagination.total).toBe(2);
     });
 
     it('should support search functionality', async () => {
@@ -198,8 +199,10 @@ describe('PatientsService', () => {
       const result = await service.update(patientId, updateData);
 
       expect(repository.update).toHaveBeenCalledWith(patientId, updateData);
-      expect(result.data.firstName).toBe('Updated');
-      expect(result.data.lastName).toBe('Name');
+      expect(result.data).toBeDefined();
+      expect(result.data.name).toBeDefined();
+      expect(result.data.name.given[0]).toBe('Updated');
+      expect(result.data.name.family).toBe('Name');
     });
 
     it('should throw NotFoundException when updating non-existent patient', async () => {

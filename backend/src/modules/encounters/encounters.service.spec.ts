@@ -46,6 +46,7 @@ describe('EncountersService', () => {
       const expectedEncounter = {
         id: 'encounter-1',
         ...createEncounterDto,
+        date: new Date(createEncounterDto.date),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -75,6 +76,7 @@ describe('EncountersService', () => {
         const expectedEncounter = {
           id: `encounter-${type}`,
           ...createEncounterDto,
+          date: new Date(createEncounterDto.date),
           createdAt: new Date(),
           updatedAt: new Date(),
         };
@@ -91,14 +93,21 @@ describe('EncountersService', () => {
 
   describe('findAll', () => {
     it('should return paginated list of encounters', async () => {
+      const encounterData = TestDataFactory.createEncounterData('patient-1', 'doctor-1');
       const mockEncounters = [
         {
           id: 'encounter-1',
-          ...TestDataFactory.createEncounterData('patient-1', 'doctor-1'),
+          ...encounterData,
+          date: new Date(encounterData.date),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           id: 'encounter-2',
           ...TestDataFactory.createEncounterData('patient-2', 'doctor-1'),
+          date: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -131,10 +140,14 @@ describe('EncountersService', () => {
 
     it('should filter encounters by patient', async () => {
       const patientId = 'patient-1';
+      const encounterData = TestDataFactory.createEncounterData(patientId, 'doctor-1');
       const mockEncounters = [
         {
           id: 'encounter-1',
-          ...TestDataFactory.createEncounterData(patientId, 'doctor-1'),
+          ...encounterData,
+          date: new Date(encounterData.date),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -167,10 +180,16 @@ describe('EncountersService', () => {
 
     it('should filter encounters by status', async () => {
       const status = EncounterStatus.COMPLETED;
+      const encounterData = TestDataFactory.createEncounterData('patient-1', 'doctor-1', {
+        status,
+      });
       const mockEncounters = [
         {
           id: 'encounter-1',
-          ...TestDataFactory.createEncounterData('patient-1', 'doctor-1', { status }),
+          ...encounterData,
+          date: new Date(encounterData.date),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -204,9 +223,13 @@ describe('EncountersService', () => {
   describe('findOne', () => {
     it('should return an encounter by id', async () => {
       const encounterId = 'encounter-1';
+      const encounterData = TestDataFactory.createEncounterData('patient-1', 'doctor-1');
       const mockEncounter = {
         id: encounterId,
-        ...TestDataFactory.createEncounterData('patient-1', 'doctor-1'),
+        ...encounterData,
+        date: new Date(encounterData.date),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockEncounterRepository.findOne.mockResolvedValue(mockEncounter);
@@ -229,14 +252,22 @@ describe('EncountersService', () => {
   describe('findByPatient', () => {
     it('should return all encounters for a patient', async () => {
       const patientId = 'patient-1';
+      const encounterData1 = TestDataFactory.createEncounterData(patientId, 'doctor-1');
+      const encounterData2 = TestDataFactory.createEncounterData(patientId, 'doctor-2');
       const mockEncounters = [
         {
           id: 'encounter-1',
-          ...TestDataFactory.createEncounterData(patientId, 'doctor-1'),
+          ...encounterData1,
+          date: new Date(encounterData1.date),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           id: 'encounter-2',
-          ...TestDataFactory.createEncounterData(patientId, 'doctor-2'),
+          ...encounterData2,
+          date: new Date(encounterData2.date),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ];
 
@@ -266,10 +297,14 @@ describe('EncountersService', () => {
         diagnosis: 'Updated diagnosis',
       };
 
+      const encounterData = TestDataFactory.createEncounterData('patient-1', 'doctor-1');
       const updatedEncounter = {
         id: encounterId,
-        ...TestDataFactory.createEncounterData('patient-1', 'doctor-1'),
+        ...encounterData,
         ...updateData,
+        date: new Date(encounterData.date),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockEncounterRepository.update.mockResolvedValue(updatedEncounter);
@@ -293,9 +328,13 @@ describe('EncountersService', () => {
   describe('remove', () => {
     it('should delete an encounter', async () => {
       const encounterId = 'encounter-1';
+      const encounterData = TestDataFactory.createEncounterData('patient-1', 'doctor-1');
       const mockEncounter = {
         id: encounterId,
-        ...TestDataFactory.createEncounterData('patient-1', 'doctor-1'),
+        ...encounterData,
+        date: new Date(encounterData.date),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockEncounterRepository.remove.mockResolvedValue(mockEncounter);

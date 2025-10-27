@@ -20,17 +20,21 @@ export class LabsService {
 
     // Queue report generation in the background
     try {
-      await this.labReportQueue.add('generate-report', {
-        labResultId: labResult.id,
-        patientId: labResult.patientId,
-        testName: labResult.testName,
-      }, {
-        attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 5000,
+      await this.labReportQueue.add(
+        'generate-report',
+        {
+          labResultId: labResult.id,
+          patientId: labResult.patientId,
+          testName: labResult.testName,
         },
-      });
+        {
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 5000,
+          },
+        },
+      );
     } catch (error) {
       // If Redis is not available, log the error but don't fail the request
       console.warn('Failed to queue lab report generation:', error.message);
@@ -39,8 +43,22 @@ export class LabsService {
     return new ApiResponse(responseDto);
   }
 
-  async findAll(page = 1, limit = 10, patientId?: string, status?: string, sortBy?: string, order?: 'asc' | 'desc') {
-    const result = await this.labRepository.findAll({ page, limit, patientId, status, sortBy, order });
+  async findAll(
+    page = 1,
+    limit = 10,
+    patientId?: string,
+    status?: string,
+    sortBy?: string,
+    order?: 'asc' | 'desc',
+  ) {
+    const result = await this.labRepository.findAll({
+      page,
+      limit,
+      patientId,
+      status,
+      sortBy,
+      order,
+    });
     const responseDtos = LabResultMapper.toResponseDtoArray(result.data);
     return new PaginatedResponse(
       responseDtos,
@@ -80,17 +98,21 @@ export class LabsService {
       // If status changed to completed, queue report generation
       if (updateLabResultDto.status === 'COMPLETED') {
         try {
-          await this.labReportQueue.add('generate-report', {
-            labResultId: labResult.id,
-            patientId: labResult.patientId,
-            testName: labResult.testName,
-          }, {
-            attempts: 3,
-            backoff: {
-              type: 'exponential',
-              delay: 5000,
+          await this.labReportQueue.add(
+            'generate-report',
+            {
+              labResultId: labResult.id,
+              patientId: labResult.patientId,
+              testName: labResult.testName,
             },
-          });
+            {
+              attempts: 3,
+              backoff: {
+                type: 'exponential',
+                delay: 5000,
+              },
+            },
+          );
         } catch (error) {
           console.warn('Failed to queue lab report generation:', error.message);
         }

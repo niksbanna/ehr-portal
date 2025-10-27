@@ -13,7 +13,7 @@ export class TestDatabaseHelper {
   private constructor() {
     // Set environment variable for SQLite in-memory database
     process.env.DATABASE_URL = DATABASE_URL;
-    
+
     this.prisma = new PrismaClient({
       datasources: {
         db: {
@@ -35,32 +35,29 @@ export class TestDatabaseHelper {
       // Create a temporary schema file for SQLite
       const schemaPath = join(__dirname, '../../prisma/schema.prisma');
       const tempSchemaPath = join(__dirname, '../../prisma/schema.test.prisma');
-      
+
       // Read the original schema
       let schema = fs.readFileSync(schemaPath, 'utf-8');
-      
+
       // Replace PostgreSQL with SQLite
       schema = schema.replace(
         /datasource db \{[^}]*\}/s,
         `datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
-}`
+}`,
       );
-      
+
       // Write temporary schema
       fs.writeFileSync(tempSchemaPath, schema);
-      
+
       // Push schema to the in-memory database
-      execSync(
-        `npx prisma db push --schema=${tempSchemaPath} --skip-generate --accept-data-loss`,
-        {
-          cwd: join(__dirname, '../../'),
-          env: { ...process.env, DATABASE_URL },
-          stdio: 'pipe',
-        }
-      );
-      
+      execSync(`npx prisma db push --schema=${tempSchemaPath} --skip-generate --accept-data-loss`, {
+        cwd: join(__dirname, '../../'),
+        env: { ...process.env, DATABASE_URL },
+        stdio: 'pipe',
+      });
+
       // Clean up temporary schema
       fs.unlinkSync(tempSchemaPath);
     } catch (error) {

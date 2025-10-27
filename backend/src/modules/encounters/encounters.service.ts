@@ -14,8 +14,22 @@ export class EncountersService {
     return new ApiResponse(responseDto);
   }
 
-  async findAll(page = 1, limit = 10, patientId?: string, status?: string, sortBy?: string, order?: 'asc' | 'desc') {
-    const result = await this.encounterRepository.findAll({ page, limit, patientId, status, sortBy, order });
+  async findAll(
+    page = 1,
+    limit = 10,
+    patientId?: string,
+    status?: string,
+    sortBy?: string,
+    order?: 'asc' | 'desc',
+  ) {
+    const result = await this.encounterRepository.findAll({
+      page,
+      limit,
+      patientId,
+      status,
+      sortBy,
+      order,
+    });
     const responseDtos = EncounterMapper.toResponseDtoArray(result.data);
     return new PaginatedResponse(
       responseDtos,

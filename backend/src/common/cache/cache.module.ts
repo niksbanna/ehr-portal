@@ -14,7 +14,7 @@ import { redisStore } from 'cache-manager-ioredis-yet';
           // Try to connect to Redis
           const redisConfig = configService.get('redis');
           console.log('Attempting to connect to Redis...');
-          
+
           return {
             store: await redisStore({
               host: redisConfig.host,

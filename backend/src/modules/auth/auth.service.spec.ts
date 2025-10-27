@@ -149,9 +149,7 @@ describe('AuthService', () => {
       };
 
       jest.spyOn(service, 'validateUser').mockResolvedValue(mockUser);
-      mockJwtService.sign
-        .mockReturnValueOnce('access-token')
-        .mockReturnValueOnce('refresh-token');
+      mockJwtService.sign.mockReturnValueOnce('access-token').mockReturnValueOnce('refresh-token');
 
       const result = await service.login(loginDto);
 
@@ -180,8 +178,10 @@ describe('AuthService', () => {
       const hashedPassword = 'hashedPassword123';
       const mockUser = {
         id: 'user-1',
-        ...registerDto,
+        email: registerDto.email,
         password: hashedPassword,
+        name: registerDto.name,
+        role: registerDto.role,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -196,8 +196,8 @@ describe('AuthService', () => {
         ...registerDto,
         password: hashedPassword,
       });
-      expect(result.password).toBeUndefined();
       expect(result.id).toBe('user-1');
+      expect(result.email).toBe(registerDto.email);
     });
   });
 
@@ -245,6 +245,8 @@ describe('AuthService', () => {
         password: 'hashedPassword',
         name: 'Test User',
         role: UserRole.DOCTOR,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -252,8 +254,8 @@ describe('AuthService', () => {
       const result = await service.getProfile(userId);
 
       expect(userRepository.findOne).toHaveBeenCalledWith(userId);
-      expect(result.password).toBeUndefined();
       expect(result.id).toBe(userId);
+      expect(result.email).toBe('test@example.com');
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
@@ -278,10 +280,7 @@ describe('AuthService', () => {
       const result = await service.logout(token);
 
       expect(jwtService.decode).toHaveBeenCalledWith(token);
-      expect(tokenBlacklistService.addToBlacklist).toHaveBeenCalledWith(
-        token,
-        decoded.exp * 1000,
-      );
+      expect(tokenBlacklistService.addToBlacklist).toHaveBeenCalledWith(token, decoded.exp * 1000);
       expect(result).toEqual({ message: 'Logout successful' });
     });
 

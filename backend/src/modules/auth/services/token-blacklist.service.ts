@@ -17,7 +17,7 @@ export class TokenBlacklistService {
   addToBlacklist(token: string, expiryTime: number): void {
     this.blacklistedTokens.add(token);
     this.tokenExpiryMap.set(token, expiryTime);
-    
+
     // Schedule cleanup after token expires
     const timeUntilExpiry = expiryTime - Date.now();
     if (timeUntilExpiry > 0) {

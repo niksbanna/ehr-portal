@@ -1,5 +1,12 @@
 import { faker } from '@faker-js/faker';
-import { Gender, UserRole, EncounterType, EncounterStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
+import {
+  Gender,
+  UserRole,
+  EncounterType,
+  EncounterStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from '@prisma/client';
 
 export class TestDataFactory {
   static createPatientData(overrides = {}) {
@@ -43,7 +50,7 @@ export class TestDataFactory {
     return {
       patientId,
       doctorId,
-      date: faker.date.recent(),
+      date: faker.date.recent().toISOString(),
       type: faker.helpers.arrayElement([
         EncounterType.CONSULTATION,
         EncounterType.FOLLOWUP,
@@ -84,7 +91,7 @@ export class TestDataFactory {
     return {
       patientId,
       encounterId,
-      date: faker.date.recent(),
+      date: faker.date.recent().toISOString(),
       items,
       subtotal,
       tax,
@@ -97,10 +104,7 @@ export class TestDataFactory {
         PaymentMethod.UPI,
         PaymentMethod.NET_BANKING,
       ]),
-      paymentStatus: faker.helpers.arrayElement([
-        PaymentStatus.PENDING,
-        PaymentStatus.PAID,
-      ]),
+      paymentStatus: faker.helpers.arrayElement([PaymentStatus.PENDING, PaymentStatus.PAID]),
       notes: faker.lorem.sentence(),
       ...overrides,
     };

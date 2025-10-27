@@ -71,11 +71,7 @@ export class PaginatedResponse<T> {
     sorting?: SortingMetadata;
   };
 
-  constructor(
-    data: T[],
-    pagination: PaginationMetadata,
-    sorting?: SortingMetadata,
-  ) {
+  constructor(data: T[], pagination: PaginationMetadata, sorting?: SortingMetadata) {
     this.data = data;
     this.meta = {
       timestamp: new Date().toISOString(),
@@ -105,12 +101,7 @@ export class ErrorResponse {
   @ApiProperty({ description: 'Timestamp when error occurred' })
   timestamp: string;
 
-  constructor(
-    statusCode: number,
-    message: string | string[],
-    error: string,
-    path?: string,
-  ) {
+  constructor(statusCode: number, message: string | string[], error: string, path?: string) {
     this.statusCode = statusCode;
     this.message = message;
     this.error = error;

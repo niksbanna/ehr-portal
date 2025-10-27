@@ -1,9 +1,5 @@
 import { LabResultEntity } from '../entities/lab-result.entity';
-import {
-  LabResultResponseDto,
-  QuantityDto,
-  ReferenceRangeDto,
-} from '../dto/lab-response.dto';
+import { LabResultResponseDto, QuantityDto, ReferenceRangeDto } from '../dto/lab-response.dto';
 import { CodeableConceptDto, ReferenceDto } from '../../encounters/dto/encounter-response.dto';
 
 /**
@@ -63,7 +59,7 @@ export class LabResultMapper {
     // Try to parse numeric value
     let valueQuantity: QuantityDto | undefined;
     let valueString: string | undefined;
-    
+
     if (labResult.results) {
       const numericValue = parseFloat(labResult.results);
       if (!isNaN(numericValue)) {

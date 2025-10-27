@@ -1,11 +1,11 @@
 import { PatientEntity } from '../entities/patient.entity';
-import { 
-  PatientResponseDto, 
-  HumanNameDto, 
-  ContactPointDto, 
-  AddressDto, 
+import {
+  PatientResponseDto,
+  HumanNameDto,
+  ContactPointDto,
+  AddressDto,
   ContactDto,
-  IdentifierDto 
+  IdentifierDto,
 } from '../dto/patient-response.dto';
 
 /**

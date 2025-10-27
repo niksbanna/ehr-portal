@@ -65,10 +65,16 @@ export class LabResultResponseDto {
   @ApiPropertyOptional({ description: 'Business identifiers' })
   identifier?: string;
 
-  @ApiProperty({ description: 'Status of the result', enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] })
+  @ApiProperty({
+    description: 'Status of the result',
+    enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED'],
+  })
   status: string;
 
-  @ApiPropertyOptional({ description: 'Category of observation (e.g., laboratory, vital-signs)', type: [CodeableConceptDto] })
+  @ApiPropertyOptional({
+    description: 'Category of observation (e.g., laboratory, vital-signs)',
+    type: [CodeableConceptDto],
+  })
   category?: CodeableConceptDto[];
 
   @ApiProperty({ description: 'Type of observation (test name)', type: CodeableConceptDto })
@@ -77,7 +83,10 @@ export class LabResultResponseDto {
   @ApiProperty({ description: 'Patient reference', type: ReferenceDto })
   subject: ReferenceDto;
 
-  @ApiPropertyOptional({ description: 'Healthcare event (encounter) reference', type: ReferenceDto })
+  @ApiPropertyOptional({
+    description: 'Healthcare event (encounter) reference',
+    type: ReferenceDto,
+  })
   encounter?: ReferenceDto;
 
   @ApiPropertyOptional({ description: 'Date/time this observation was made' })
@@ -86,7 +95,10 @@ export class LabResultResponseDto {
   @ApiPropertyOptional({ description: 'Date/time the observation was issued' })
   issued?: string;
 
-  @ApiPropertyOptional({ description: 'Who is responsible for the observation', type: ReferenceDto })
+  @ApiPropertyOptional({
+    description: 'Who is responsible for the observation',
+    type: ReferenceDto,
+  })
   performer?: ReferenceDto;
 
   @ApiPropertyOptional({ description: 'Actual result value', type: QuantityDto })
@@ -107,10 +119,16 @@ export class LabResultResponseDto {
   @ApiPropertyOptional({ description: 'Comments about result' })
   note?: string;
 
-  @ApiPropertyOptional({ description: 'Provides guide for interpretation', type: [ReferenceRangeDto] })
+  @ApiPropertyOptional({
+    description: 'Provides guide for interpretation',
+    type: [ReferenceRangeDto],
+  })
   referenceRange?: ReferenceRangeDto[];
 
-  @ApiPropertyOptional({ description: 'Component observations (for panels)', type: [ObservationComponentDto] })
+  @ApiPropertyOptional({
+    description: 'Component observations (for panels)',
+    type: [ObservationComponentDto],
+  })
   component?: ObservationComponentDto[];
 
   @ApiPropertyOptional({ description: 'Creation timestamp' })

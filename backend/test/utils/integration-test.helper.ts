@@ -7,7 +7,7 @@ export class IntegrationTestHelper {
     const moduleFixture: TestingModule = await Test.createTestingModule(moduleMetadata).compile();
 
     const app = moduleFixture.createNestApplication();
-    
+
     // Apply same global pipes as main app
     app.useGlobalPipes(
       new ValidationPipe({
