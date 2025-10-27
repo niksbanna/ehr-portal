@@ -1,16 +1,41 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 import { CreateLabResultDto, UpdateLabResultDto } from './dto/lab.dto';
 import { LabRepository } from './repositories/lab.repository';
 import { LabResultMapper } from './mappers/lab-result.mapper';
 import { ApiResponse, PaginatedResponse } from '../../common/dto/response.dto';
+import { LabReportJob } from './processors/lab-report.processor';
 
 @Injectable()
 export class LabsService {
-  constructor(private labRepository: LabRepository) {}
+  constructor(
+    private labRepository: LabRepository,
+    @InjectQueue('lab-reports') private labReportQueue: Queue<LabReportJob>,
+  ) {}
 
   async create(createLabResultDto: CreateLabResultDto) {
     const labResult = await this.labRepository.create(createLabResultDto);
     const responseDto = LabResultMapper.toResponseDto(labResult);
+
+    // Queue report generation in the background
+    try {
+      await this.labReportQueue.add('generate-report', {
+        labResultId: labResult.id,
+        patientId: labResult.patientId,
+        testName: labResult.testName,
+      }, {
+        attempts: 3,
+        backoff: {
+          type: 'exponential',
+          delay: 5000,
+        },
+      });
+    } catch (error) {
+      // If Redis is not available, log the error but don't fail the request
+      console.warn('Failed to queue lab report generation:', error.message);
+    }
+
     return new ApiResponse(responseDto);
   }
 
@@ -51,6 +76,26 @@ export class LabsService {
     try {
       const labResult = await this.labRepository.update(id, updateLabResultDto);
       const responseDto = LabResultMapper.toResponseDto(labResult);
+
+      // If status changed to completed, queue report generation
+      if (updateLabResultDto.status === 'COMPLETED') {
+        try {
+          await this.labReportQueue.add('generate-report', {
+            labResultId: labResult.id,
+            patientId: labResult.patientId,
+            testName: labResult.testName,
+          }, {
+            attempts: 3,
+            backoff: {
+              type: 'exponential',
+              delay: 5000,
+            },
+          });
+        } catch (error) {
+          console.warn('Failed to queue lab report generation:', error.message);
+        }
+      }
+
       return new ApiResponse(responseDto);
     } catch (error) {
       throw new NotFoundException(`Lab result with ID ${id} not found`);

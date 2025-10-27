@@ -7,10 +7,14 @@ Backend API for the Electronic Health Records (EHR) Portal built with NestJS, Ty
 - **Authentication**: JWT-based authentication with refresh tokens
 - **Patient Management**: Complete CRUD operations for patient records
 - **Encounters**: Medical encounter tracking and management
-- **Lab Results**: Laboratory test ordering and results management
+- **Lab Results**: Laboratory test ordering and results management with background queue
 - **Prescriptions**: Medication prescription management
 - **Billing**: Invoice and payment processing
 - **Reports**: Dashboard statistics and various reports
+- **Caching**: Redis-backed caching with in-memory fallback for frequent reads
+- **Background Jobs**: BullMQ queue for async processing (lab reports)
+- **Pagination**: Efficient pagination for all major endpoints
+- **Error Handling**: Comprehensive error handling with proper HTTP codes
 
 ## Tech Stack
 
@@ -19,6 +23,8 @@ Backend API for the Electronic Health Records (EHR) Portal built with NestJS, Ty
 - **Database**: PostgreSQL 16
 - **ORM**: Prisma 5.x
 - **Authentication**: JWT with Passport
+- **Cache**: Redis (with in-memory fallback)
+- **Queue**: BullMQ for background jobs
 - **Documentation**: Swagger/OpenAPI
 - **Container**: Docker & Docker Compose
 
@@ -26,6 +32,7 @@ Backend API for the Electronic Health Records (EHR) Portal built with NestJS, Ty
 
 - Node.js 20+
 - PostgreSQL 16+ (or use Docker)
+- Redis 7+ (optional - falls back to in-memory cache)
 - npm or yarn
 
 ## Getting Started
@@ -227,6 +234,46 @@ Key environment variables (see `.env.example` for complete list):
 - `JWT_EXPIRATION` - Access token expiration time
 - `PORT` - Application port (default: 3000)
 - `CORS_ORIGIN` - Allowed CORS origin
+- `REDIS_HOST` - Redis host (optional, defaults to localhost)
+- `REDIS_PORT` - Redis port (optional, defaults to 6379)
+- `CACHE_TTL` - Cache time-to-live in seconds (default: 3600)
+
+## Performance Features
+
+### Caching
+The application uses Redis-backed caching with automatic fallback to in-memory cache. Frequently accessed data (ICD-10 codes, departments, drug lists) are cached for improved performance.
+
+**Cached Endpoints:**
+- `GET /api/settings/icd-codes` - ICD-10 diagnostic codes
+- `GET /api/settings/departments` - Hospital departments
+- `GET /api/settings/drugs` - Drug formulary
+- `GET /api/settings/category/:category` - Any settings category
+
+### Background Jobs
+Lab report generation is processed asynchronously using BullMQ. When lab results are created or completed, report generation jobs are queued for background processing.
+
+### Pagination
+All major endpoints support pagination with `page` and `limit` query parameters:
+- `/api/labs?page=1&limit=10`
+- `/api/prescriptions?page=1&limit=10`
+- `/api/patients?page=1&limit=10`
+- `/api/encounters?page=1&limit=10`
+
+### Error Handling
+Enhanced error handling with:
+- Consistent JSON error format
+- Proper HTTP status codes
+- Prisma error mapping
+- Structured logging
+
+For detailed documentation, see [PERFORMANCE_ENHANCEMENTS.md](./PERFORMANCE_ENHANCEMENTS.md)
+
+## Testing
+
+Run the manual testing guide:
+```bash
+./test-performance.sh
+```
 
 ## Security
 
@@ -235,6 +282,7 @@ Key environment variables (see `.env.example` for complete list):
 - Input validation with class-validator
 - CORS protection
 - Environment-based configuration
+- Comprehensive error handling without sensitive data leaks
 
 ## License
 
