@@ -313,17 +313,18 @@ model Role {
 }
 
 model AuditLog {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  action      String   // e.g., "CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT"
-  entity      String   // e.g., "Patient", "Encounter", "User"
-  entityId    String?  // ID of the affected entity
-  changes     Json?    // Before/after values for updates
+  user        User?     @relation(fields: [userId], references: [id])
+  userRole    UserRole? // Role at the time of action
+  action      String    // e.g., "CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT"
+  entity      String    // e.g., "Patient", "Encounter", "User"
+  entityId    String?   // ID of the affected entity
+  changes     Json?     // Before/after values for updates
   ipAddress   String?
   userAgent   String?
-  timestamp   DateTime @default(now())
-  status      String?  // e.g., "SUCCESS", "FAILURE"
+  timestamp   DateTime  @default(now())
+  status      String?   // e.g., "SUCCESS", "FAILURE"
   errorMessage String?
 
   @@index([userId])
