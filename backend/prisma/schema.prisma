@@ -22,6 +22,9 @@ model User {
   encounters    Encounter[]
   prescriptions Prescription[]
   labResults    LabResult[]
+  observations  Observation[]
+  medications   Medication[]
+  auditLogs     AuditLog[]
 
   @@map("users")
 }
@@ -33,34 +36,37 @@ enum UserRole {
   LAB_TECH
   PHARMACIST
   BILLING
+  RECEPTIONIST
 }
 
 model Patient {
   id                String   @id @default(uuid())
   firstName         String
   lastName          String
-  dateOfBirth       String
+  dateOfBirth       String   // Format: DD-MM-YYYY
   gender            Gender
-  phone             String
+  phone             String   // Format: +91XXXXXXXXXX
   email             String
-  aadhaar           String?
+  aadhaar           String?  @unique // Format: XXXX-XXXX-XXXX (masked, last 4 digits)
   address           String
   city              String
   state             String
-  pincode           String
+  pincode           String   // 6-digit Indian pincode
   emergencyContact  String
-  emergencyPhone    String
+  emergencyPhone    String   // Format: +91XXXXXXXXXX
   bloodGroup        String?
   allergies         String?
   medicalHistory    String?
-  registrationDate  String
+  registrationDate  String   // Format: DD-MM-YYYY
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
   encounters    Encounter[]
   labResults    LabResult[]
   prescriptions Prescription[]
+  medications   Medication[]
   bills         Bill[]
+  observations  Observation[]
 
   @@map("patients")
 }
@@ -91,7 +97,9 @@ model Encounter {
 
   labResults    LabResult[]
   prescriptions Prescription[]
+  medications   Medication[]
   bills         Bill[]
+  observations  Observation[]
 
   @@map("encounters")
 }
@@ -169,11 +177,12 @@ model Bill {
   encounterId   String?
   encounter     Encounter?    @relation(fields: [encounterId], references: [id])
   date          DateTime
-  items         Json
-  subtotal      Float
-  tax           Float
-  discount      Float         @default(0)
-  total         Float
+  items         Json          // Array of billing items with name, quantity, rate (in INR)
+  subtotal      Float         // Amount in INR
+  tax           Float         // Tax amount in INR (GST)
+  discount      Float         @default(0) // Discount in INR
+  total         Float         // Total amount in INR
+  currency      String        @default("INR")
   paymentMethod PaymentMethod
   paymentStatus PaymentStatus @default(PENDING)
   notes         String?
@@ -187,6 +196,8 @@ enum PaymentMethod {
   CASH
   CARD
   UPI
+  NET_BANKING
+  CHEQUE
 }
 
 enum PaymentStatus {
@@ -206,4 +217,117 @@ model Setting {
   updatedAt   DateTime @updatedAt
 
   @@map("settings")
+}
+
+model Observation {
+  id          String            @id @default(uuid())
+  patientId   String
+  patient     Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  encounterId String?
+  encounter   Encounter?        @relation(fields: [encounterId], references: [id])
+  recordedById String
+  recordedBy  User              @relation(fields: [recordedById], references: [id])
+  date        DateTime
+  type        ObservationType
+  category    String            // e.g., "vital-signs", "physical-exam", "laboratory"
+  code        String?           // LOINC or SNOMED code
+  display     String            // Human-readable name
+  value       Json              // Can store different value types (quantity, text, boolean, etc.)
+  unit        String?           // Unit of measurement
+  interpretation String?        // e.g., "normal", "high", "low"
+  notes       String?
+  status      ObservationStatus @default(FINAL)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@map("observations")
+}
+
+enum ObservationType {
+  VITAL_SIGN
+  LABORATORY
+  IMAGING
+  PROCEDURE
+  PHYSICAL_EXAM
+  SOCIAL_HISTORY
+}
+
+enum ObservationStatus {
+  REGISTERED
+  PRELIMINARY
+  FINAL
+  AMENDED
+  CANCELLED
+}
+
+model Medication {
+  id              String           @id @default(uuid())
+  patientId       String
+  patient         Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  encounterId     String?
+  encounter       Encounter?       @relation(fields: [encounterId], references: [id])
+  name            String           // Medication name
+  genericName     String?
+  brandName       String?
+  dosage          String           // e.g., "500mg"
+  form            String           // e.g., "tablet", "syrup", "injection"
+  route           String           // e.g., "oral", "IV", "topical"
+  frequency       String           // e.g., "twice daily", "every 6 hours"
+  duration        String           // e.g., "7 days", "1 month"
+  quantity        Int?             // Number of units
+  instructions    String?
+  indication      String?          // Reason for medication
+  startDate       DateTime
+  endDate         DateTime?
+  status          MedicationStatus @default(ACTIVE)
+  pricePerUnit    Float?           // Price in INR
+  totalCost       Float?           // Total cost in INR
+  prescribedById  String?
+  prescribedBy    User?            @relation(fields: [prescribedById], references: [id])
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("medications")
+}
+
+enum MedicationStatus {
+  ACTIVE
+  COMPLETED
+  DISCONTINUED
+  ON_HOLD
+  CANCELLED
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique // e.g., "ADMIN", "DOCTOR", "NURSE"
+  displayName String   // e.g., "Administrator", "Medical Doctor"
+  description String?
+  permissions Json     // Array of permission strings
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("roles")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  action      String   // e.g., "CREATE", "UPDATE", "DELETE", "LOGIN", "LOGOUT"
+  entity      String   // e.g., "Patient", "Encounter", "User"
+  entityId    String?  // ID of the affected entity
+  changes     Json?    // Before/after values for updates
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime @default(now())
+  status      String?  // e.g., "SUCCESS", "FAILURE"
+  errorMessage String?
+
+  @@index([userId])
+  @@index([entity])
+  @@index([timestamp])
+  @@map("audit_logs")
 }
