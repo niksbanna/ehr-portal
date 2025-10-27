@@ -1,17 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { PatientRepository } from './repositories/patient.repository';
+import { PatientMapper } from './mappers/patient.mapper';
+import { ApiResponse, PaginatedResponse } from '../../common/dto/response.dto';
+import { PatientResponseDto } from './dto/patient-response.dto';
 
 @Injectable()
 export class PatientsService {
   constructor(private patientRepository: PatientRepository) {}
 
   async create(createPatientDto: CreatePatientDto) {
-    return this.patientRepository.create(createPatientDto);
+    const patient = await this.patientRepository.create(createPatientDto);
+    const responseDto = PatientMapper.toResponseDto(patient);
+    return new ApiResponse(responseDto);
   }
 
-  async findAll(page = 1, limit = 10, search?: string) {
-    return this.patientRepository.findAll({ page, limit, search });
+  async findAll(page = 1, limit = 10, search?: string, sortBy?: string, order?: 'asc' | 'desc') {
+    const result = await this.patientRepository.findAll({ page, limit, search, sortBy, order });
+    const responseDtos = PatientMapper.toResponseDtoArray(result.data);
+    return new PaginatedResponse(
+      responseDtos,
+      result.pagination,
+      sortBy ? { sortBy, order } : undefined,
+    );
   }
 
   async findOne(id: string) {
@@ -21,12 +32,15 @@ export class PatientsService {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
 
-    return patient;
+    const responseDto = PatientMapper.toResponseDto(patient);
+    return new ApiResponse(responseDto);
   }
 
   async update(id: string, updatePatientDto: UpdatePatientDto) {
     try {
-      return await this.patientRepository.update(id, updatePatientDto);
+      const patient = await this.patientRepository.update(id, updatePatientDto);
+      const responseDto = PatientMapper.toResponseDto(patient);
+      return new ApiResponse(responseDto);
     } catch (error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
@@ -34,13 +48,17 @@ export class PatientsService {
 
   async remove(id: string) {
     try {
-      return await this.patientRepository.remove(id);
+      const patient = await this.patientRepository.remove(id);
+      const responseDto = PatientMapper.toResponseDto(patient);
+      return new ApiResponse(responseDto);
     } catch (error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
   }
 
   async search(query: string) {
-    return this.patientRepository.search(query);
+    const patients = await this.patientRepository.search(query);
+    const responseDtos = PatientMapper.toResponseDtoArray(patients);
+    return new ApiResponse(responseDtos);
   }
 }

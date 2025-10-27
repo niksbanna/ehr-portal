@@ -39,18 +39,24 @@ export class LabsController {
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'patientId', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Field to sort by (e.g., orderedDate, status)' })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Sort order' })
   @ApiResponse({ status: 200, description: 'Lab results retrieved successfully' })
   findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('patientId') patientId?: string,
     @Query('status') status?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('order') order?: 'asc' | 'desc',
   ) {
     return this.labsService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 10,
       patientId,
       status,
+      sortBy,
+      order,
     );
   }
 

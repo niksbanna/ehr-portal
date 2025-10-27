@@ -18,10 +18,14 @@ export class PatientRepository implements IRepository<PatientEntity> {
     page?: number;
     limit?: number;
     search?: string;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
   }): Promise<{ data: PatientEntity[]; pagination: any }> {
     const page = options?.page || 1;
     const limit = options?.limit || 10;
     const skip = (page - 1) * limit;
+    const sortBy = options?.sortBy || 'createdAt';
+    const order = options?.order || 'desc';
 
     const where = options?.search
       ? {
@@ -39,7 +43,7 @@ export class PatientRepository implements IRepository<PatientEntity> {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: order },
       }),
       this.prisma.patient.count({ where }),
     ]);

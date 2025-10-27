@@ -38,16 +38,22 @@ export class PatientsController {
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   @ApiQuery({ name: 'search', required: false, type: String })
+  @ApiQuery({ name: 'sortBy', required: false, type: String, description: 'Field to sort by (e.g., firstName, lastName, createdAt)' })
+  @ApiQuery({ name: 'order', required: false, enum: ['asc', 'desc'], description: 'Sort order' })
   @ApiResponse({ status: 200, description: 'Patients retrieved successfully' })
   findAll(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
     @Query('search') search?: string,
+    @Query('sortBy') sortBy?: string,
+    @Query('order') order?: 'asc' | 'desc',
   ) {
     return this.patientsService.findAll(
       page ? parseInt(page) : 1,
       limit ? parseInt(limit) : 10,
       search,
+      sortBy,
+      order,
     );
   }
 

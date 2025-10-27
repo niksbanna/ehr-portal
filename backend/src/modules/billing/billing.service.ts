@@ -1,17 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBillDto, UpdateBillDto } from './dto/bill.dto';
 import { BillingRepository } from './repositories/billing.repository';
+import { BillMapper } from './mappers/bill.mapper';
+import { ApiResponse, PaginatedResponse } from '../../common/dto/response.dto';
 
 @Injectable()
 export class BillingService {
   constructor(private billingRepository: BillingRepository) {}
 
   async create(createBillDto: CreateBillDto) {
-    return this.billingRepository.create(createBillDto);
+    const bill = await this.billingRepository.create(createBillDto);
+    const responseDto = BillMapper.toResponseDto(bill);
+    return new ApiResponse(responseDto);
   }
 
-  async findAll(page = 1, limit = 10, patientId?: string, status?: string) {
-    return this.billingRepository.findAll({ page, limit, patientId, status });
+  async findAll(page = 1, limit = 10, patientId?: string, status?: string, sortBy?: string, order?: 'asc' | 'desc') {
+    const result = await this.billingRepository.findAll({ page, limit, patientId, status, sortBy, order });
+    const responseDtos = BillMapper.toResponseDtoArray(result.data);
+    return new PaginatedResponse(
+      responseDtos,
+      result.pagination,
+      sortBy ? { sortBy, order } : undefined,
+    );
   }
 
   async findOne(id: string) {
@@ -21,16 +31,21 @@ export class BillingService {
       throw new NotFoundException(`Bill with ID ${id} not found`);
     }
 
-    return bill;
+    const responseDto = BillMapper.toResponseDto(bill);
+    return new ApiResponse(responseDto);
   }
 
   async findByPatient(patientId: string) {
-    return this.billingRepository.findByPatient(patientId);
+    const bills = await this.billingRepository.findByPatient(patientId);
+    const responseDtos = BillMapper.toResponseDtoArray(bills);
+    return new ApiResponse(responseDtos);
   }
 
   async update(id: string, updateBillDto: UpdateBillDto) {
     try {
-      return await this.billingRepository.update(id, updateBillDto);
+      const bill = await this.billingRepository.update(id, updateBillDto);
+      const responseDto = BillMapper.toResponseDto(bill);
+      return new ApiResponse(responseDto);
     } catch (error) {
       throw new NotFoundException(`Bill with ID ${id} not found`);
     }
@@ -38,7 +53,9 @@ export class BillingService {
 
   async remove(id: string) {
     try {
-      return await this.billingRepository.remove(id);
+      const bill = await this.billingRepository.remove(id);
+      const responseDto = BillMapper.toResponseDto(bill);
+      return new ApiResponse(responseDto);
     } catch (error) {
       throw new NotFoundException(`Bill with ID ${id} not found`);
     }
