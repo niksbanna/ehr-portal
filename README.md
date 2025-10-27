@@ -1,5 +1,8 @@
 # EHR Portal - Electronic Health Records System
 
+[![Frontend CI](https://github.com/niksbanna/ehr-portal/actions/workflows/ci.yml/badge.svg)](https://github.com/niksbanna/ehr-portal/actions/workflows/ci.yml)
+[![Backend CI/CD](https://github.com/niksbanna/ehr-portal/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/niksbanna/ehr-portal/actions/workflows/backend-ci.yml)
+
 A comprehensive Electronic Health Records (EHR) web application built with React, TypeScript, and Vite for Indian hospitals.
 
 ## Features

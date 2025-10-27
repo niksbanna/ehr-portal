@@ -44,3 +44,6 @@ test.db-journal
 .env.development.local
 .env.test.local
 .env.production.local
+
+# OpenAPI generated files
+openapi.json

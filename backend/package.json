@@ -16,6 +16,7 @@
     "start:prod": "node dist/main",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint \"src/**/*.ts\" \"test/**/*.ts\" -c .eslintrc.js --fix",
     "lint:check": "ESLINT_USE_FLAT_CONFIG=false eslint \"src/**/*.ts\" \"test/**/*.ts\" -c .eslintrc.js",
+    "lint-staged": "lint-staged",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

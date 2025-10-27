@@ -6,6 +6,7 @@ import { PrismaModule } from './common/prisma.module';
 import { CacheModule } from './common/cache/cache.module';
 import { QueueModule } from './common/queue/queue.module';
 import { AuditLogInterceptor } from './common/interceptors/audit-log.interceptor';
+import { HealthController } from './common/health.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { PatientsModule } from './modules/patients/patients.module';
 import { EncountersModule } from './modules/encounters/encounters.module';
@@ -35,6 +36,7 @@ import { AuditModule } from './modules/audit/audit.module';
     SettingsModule,
     AuditModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_INTERCEPTOR,
