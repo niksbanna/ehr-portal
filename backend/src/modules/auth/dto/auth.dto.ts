@@ -20,6 +20,7 @@ export enum UserRole {
   LAB_TECH = 'LAB_TECH',
   PHARMACIST = 'PHARMACIST',
   BILLING = 'BILLING',
+  RECEPTIONIST = 'RECEPTIONIST',
 }
 
 export class RegisterDto {
