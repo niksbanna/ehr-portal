@@ -13,16 +13,20 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@ne
 import { PrescriptionsService } from './prescriptions.service';
 import { CreatePrescriptionDto, UpdatePrescriptionDto } from './dto/prescription.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Prescriptions')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('prescriptions')
 export class PrescriptionsController {
   constructor(private readonly prescriptionsService: PrescriptionsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new prescription' })
+  @Roles(UserRole.ADMIN, UserRole.DOCTOR)
+  @ApiOperation({ summary: 'Create a new prescription (Doctor only)' })
   @ApiResponse({ status: 201, description: 'Prescription created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   create(@Body() createPrescriptionDto: CreatePrescriptionDto) {
