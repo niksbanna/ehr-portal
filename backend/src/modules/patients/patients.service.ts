@@ -1,64 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../common/prisma.service';
 import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
+import { PatientRepository } from './repositories/patient.repository';
 
 @Injectable()
 export class PatientsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private patientRepository: PatientRepository) {}
 
   async create(createPatientDto: CreatePatientDto) {
-    return this.prisma.patient.create({
-      data: createPatientDto,
-    });
+    return this.patientRepository.create(createPatientDto);
   }
 
   async findAll(page = 1, limit = 10, search?: string) {
-    const skip = (page - 1) * limit;
-    
-    const where = search
-      ? {
-          OR: [
-            { firstName: { contains: search, mode: 'insensitive' as const } },
-            { lastName: { contains: search, mode: 'insensitive' as const } },
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { phone: { contains: search } },
-          ],
-        }
-      : {};
-
-    const [patients, total] = await Promise.all([
-      this.prisma.patient.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.patient.count({ where }),
-    ]);
-
-    return {
-      data: patients,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNext: page * limit < total,
-        hasPrev: page > 1,
-      },
-    };
+    return this.patientRepository.findAll({ page, limit, search });
   }
 
   async findOne(id: string) {
-    const patient = await this.prisma.patient.findUnique({
-      where: { id },
-      include: {
-        encounters: true,
-        labResults: true,
-        prescriptions: true,
-        bills: true,
-      },
-    });
+    const patient = await this.patientRepository.findOne(id);
 
     if (!patient) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
@@ -69,10 +26,7 @@ export class PatientsService {
 
   async update(id: string, updatePatientDto: UpdatePatientDto) {
     try {
-      return await this.prisma.patient.update({
-        where: { id },
-        data: updatePatientDto,
-      });
+      return await this.patientRepository.update(id, updatePatientDto);
     } catch (error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
@@ -80,25 +34,13 @@ export class PatientsService {
 
   async remove(id: string) {
     try {
-      return await this.prisma.patient.delete({
-        where: { id },
-      });
+      return await this.patientRepository.remove(id);
     } catch (error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
   }
 
   async search(query: string) {
-    return this.prisma.patient.findMany({
-      where: {
-        OR: [
-          { firstName: { contains: query, mode: 'insensitive' } },
-          { lastName: { contains: query, mode: 'insensitive' } },
-          { email: { contains: query, mode: 'insensitive' } },
-          { phone: { contains: query } },
-        ],
-      },
-      take: 20,
-    });
+    return this.patientRepository.search(query);
   }
 }

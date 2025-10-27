@@ -194,3 +194,16 @@ enum PaymentStatus {
   PAID
   CANCELLED
 }
+
+model Setting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  category    String
+  description String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("settings")
+}
