@@ -9,6 +9,7 @@ interface I18nContextType {
   t: (key: string) => string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {

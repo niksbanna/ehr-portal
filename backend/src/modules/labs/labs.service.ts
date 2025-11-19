@@ -119,7 +119,7 @@ export class LabsService {
       }
 
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Lab result with ID ${id} not found`);
     }
   }
@@ -129,7 +129,7 @@ export class LabsService {
       const labResult = await this.labRepository.remove(id);
       const responseDto = LabResultMapper.toResponseDto(labResult);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Lab result with ID ${id} not found`);
     }
   }

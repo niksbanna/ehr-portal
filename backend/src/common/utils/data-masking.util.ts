@@ -55,10 +55,10 @@ export function maskSensitiveData(obj: any): any {
   }
 
   const masked = { ...obj };
-  const sensitiveFields = ['aadhaar', 'pan', 'panNumber'];
+  const _sensitiveFields = ['aadhaar', 'pan', 'panNumber'];
 
   for (const key in masked) {
-    if (masked.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(masked, key)) {
       const lowerKey = key.toLowerCase();
 
       if (lowerKey === 'aadhaar') {

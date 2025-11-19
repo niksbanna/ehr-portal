@@ -60,7 +60,7 @@ export class EncountersService {
       const encounter = await this.encounterRepository.update(id, updateEncounterDto);
       const responseDto = EncounterMapper.toResponseDto(encounter);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Encounter with ID ${id} not found`);
     }
   }
@@ -70,7 +70,7 @@ export class EncountersService {
       const encounter = await this.encounterRepository.remove(id);
       const responseDto = EncounterMapper.toResponseDto(encounter);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Encounter with ID ${id} not found`);
     }
   }

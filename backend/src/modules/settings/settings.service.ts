@@ -78,7 +78,7 @@ export class SettingsService {
       await this.cacheManager.del(`settings:category:${setting.category}`);
       await this.cacheManager.del(`settings:key:${setting.key}`);
       return setting;
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Setting with ID ${id} not found`);
     }
   }
@@ -91,7 +91,7 @@ export class SettingsService {
         await this.cacheManager.del(`settings:key:${setting.key}`);
       }
       return await this.settingRepository.remove(id);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Setting with ID ${id} not found`);
     }
   }

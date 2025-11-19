@@ -31,9 +31,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
-        const responseObj = exceptionResponse as any;
-        message = responseObj.message || exception.message;
-        error = responseObj.error || exception.name;
+        const responseObj = exceptionResponse as Record<string, unknown>;
+        message = (responseObj.message as string | string[]) || exception.message;
+        error = (responseObj.error as string) || exception.name;
       } else {
         message = exceptionResponse as string;
         error = exception.name;
@@ -41,7 +41,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof Error) {
       // Handle Prisma errors
       if (exception.name === 'PrismaClientKnownRequestError') {
-        const prismaError = exception as any;
+        const prismaError = exception as Error & { code?: string; meta?: Record<string, unknown> };
         status = this.handlePrismaError(prismaError);
         message = this.getPrismaErrorMessage(prismaError);
         error = 'Database Error';
@@ -85,7 +85,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Map Prisma error codes to HTTP status codes
    */
-  private handlePrismaError(error: any): number {
+  private handlePrismaError(error: Error & { code?: string }): number {
     switch (error.code) {
       case 'P2002': // Unique constraint violation
         return HttpStatus.CONFLICT;
@@ -106,7 +106,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
   /**
    * Get user-friendly error messages for Prisma errors
    */
-  private getPrismaErrorMessage(error: any): string {
+  private getPrismaErrorMessage(
+    error: Error & { code?: string; meta?: Record<string, unknown> },
+  ): string {
     switch (error.code) {
       case 'P2002':
         return `A record with this ${error.meta?.target?.[0] || 'field'} already exists`;

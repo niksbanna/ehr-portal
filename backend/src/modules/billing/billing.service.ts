@@ -60,7 +60,7 @@ export class BillingService {
       const bill = await this.billingRepository.update(id, updateBillDto);
       const responseDto = BillMapper.toResponseDto(bill);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Bill with ID ${id} not found`);
     }
   }
@@ -70,7 +70,7 @@ export class BillingService {
       const bill = await this.billingRepository.remove(id);
       const responseDto = BillMapper.toResponseDto(bill);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Bill with ID ${id} not found`);
     }
   }
