@@ -11,7 +11,7 @@ const PatientHeader = ({ patient, onClose }: PatientHeaderProps) => {
   const { t } = useI18n();
 
   return (
-    <div 
+    <div
       className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800 px-6 py-3"
       role="banner"
       aria-label="Active patient information"
@@ -23,9 +23,7 @@ const PatientHeader = ({ patient, onClose }: PatientHeaderProps) => {
               <span className="text-sm text-gray-600 dark:text-gray-400">
                 {t('dashboard.patientId')}:
               </span>
-              <span className="font-semibold text-gray-900 dark:text-gray-100">
-                {patient.id}
-              </span>
+              <span className="font-semibold text-gray-900 dark:text-gray-100">{patient.id}</span>
             </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100">
               {patient.firstName} {patient.lastName}
@@ -33,29 +31,19 @@ const PatientHeader = ({ patient, onClose }: PatientHeaderProps) => {
           </div>
           <div className="flex space-x-4 text-sm">
             <div>
-              <span className="text-gray-600 dark:text-gray-400">
-                {t('patients.dateOfBirth')}:
-              </span>
-              <span className="ml-1 text-gray-900 dark:text-gray-100">
-                {patient.dateOfBirth}
-              </span>
+              <span className="text-gray-600 dark:text-gray-400">{t('patients.dateOfBirth')}:</span>
+              <span className="ml-1 text-gray-900 dark:text-gray-100">{patient.dateOfBirth}</span>
             </div>
             <div>
-              <span className="text-gray-600 dark:text-gray-400">
-                {t('patients.phone')}:
-              </span>
-              <span className="ml-1 text-gray-900 dark:text-gray-100">
-                {patient.phone}
-              </span>
+              <span className="text-gray-600 dark:text-gray-400">{t('patients.phone')}:</span>
+              <span className="ml-1 text-gray-900 dark:text-gray-100">{patient.phone}</span>
             </div>
             {patient.bloodGroup && (
               <div>
                 <span className="text-gray-600 dark:text-gray-400">
                   {t('patients.bloodGroup')}:
                 </span>
-                <span className="ml-1 text-gray-900 dark:text-gray-100">
-                  {patient.bloodGroup}
-                </span>
+                <span className="ml-1 text-gray-900 dark:text-gray-100">{patient.bloodGroup}</span>
               </div>
             )}
           </div>

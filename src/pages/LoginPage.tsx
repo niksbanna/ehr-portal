@@ -11,7 +11,11 @@ interface LoginForm {
 
 const LoginPage = () => {
   const { t } = useI18n();
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginForm>();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState('');
@@ -34,15 +38,13 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
       <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-blue-900 dark:text-blue-400">
-            {t('app.title')}
-          </h1>
+          <h1 className="text-3xl font-bold text-blue-900 dark:text-blue-400">{t('app.title')}</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">{t('app.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label 
+            <label
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               htmlFor="email"
             >
@@ -58,14 +60,18 @@ const LoginPage = () => {
               aria-describedby={errors.email ? 'email-error' : undefined}
             />
             {errors.email && (
-              <p id="email-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+              <p
+                id="email-error"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+                role="alert"
+              >
                 {errors.email.message}
               </p>
             )}
           </div>
 
           <div>
-            <label 
+            <label
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               htmlFor="password"
             >
@@ -81,14 +87,21 @@ const LoginPage = () => {
               aria-describedby={errors.password ? 'password-error' : undefined}
             />
             {errors.password && (
-              <p id="password-error" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+              <p
+                id="password-error"
+                className="mt-1 text-sm text-red-600 dark:text-red-400"
+                role="alert"
+              >
                 {errors.password.message}
               </p>
             )}
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg" role="alert">
+            <div
+              className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg"
+              role="alert"
+            >
               {error}
             </div>
           )}

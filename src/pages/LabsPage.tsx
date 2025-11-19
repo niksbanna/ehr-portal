@@ -3,7 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { format } from 'date-fns';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
 // Mock trending data for demonstration
@@ -14,7 +23,7 @@ const mockTrendData = {
     { date: '2024-10-15', value: 112 },
     { date: '2024-10-25', value: 110 },
   ],
-  'HbA1c': [
+  HbA1c: [
     { date: '2024-07-25', value: 7.2 },
     { date: '2024-08-25', value: 6.9 },
     { date: '2024-09-25', value: 6.7 },
@@ -24,7 +33,7 @@ const mockTrendData = {
 
 const LabsPage = () => {
   const [selectedTrend, setSelectedTrend] = useState<string | null>(null);
-  
+
   const { data: labResults, isLoading } = useQuery({
     queryKey: ['labResults'],
     queryFn: () => api.getLabResults(),
@@ -39,7 +48,9 @@ const LabsPage = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Lab Results</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Laboratory test results and trends</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            Laboratory test results and trends
+          </p>
         </div>
 
         {/* Trend Visualization */}
@@ -62,20 +73,17 @@ const LabsPage = () => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={mockTrendData[selectedTrend as keyof typeof mockTrendData]}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(date) => format(new Date(date), 'MMM dd')}
-                />
+                <XAxis dataKey="date" tickFormatter={(date) => format(new Date(date), 'MMM dd')} />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   labelFormatter={(date) => format(new Date(date), 'PPP')}
                   formatter={(value: number) => [value, selectedTrend]}
                 />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#2563eb" 
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#2563eb"
                   strokeWidth={2}
                   dot={{ fill: '#2563eb', r: 4 }}
                   activeDot={{ r: 6 }}
@@ -95,14 +103,30 @@ const LabsPage = () => {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Patient</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Test Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Ordered Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Results</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Trend</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Patient
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Test Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Ordered Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Results
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">
+                    Trend
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -129,8 +153,8 @@ const LabsPage = () => {
                           lab.status === 'completed'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : lab.status === 'in-progress'
-                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                         }`}
                       >
                         {lab.status}
@@ -139,12 +163,18 @@ const LabsPage = () => {
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {lab.status === 'completed' ? (
                         <div className="space-y-1">
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{lab.results}</p>
+                          <p className="font-medium text-gray-900 dark:text-gray-100">
+                            {lab.results}
+                          </p>
                           {lab.normalRange && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Normal: {lab.normalRange}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              Normal: {lab.normalRange}
+                            </p>
                           )}
                           {lab.remarks && (
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{lab.remarks}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {lab.remarks}
+                            </p>
                           )}
                         </div>
                       ) : (

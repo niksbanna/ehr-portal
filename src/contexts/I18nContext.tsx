@@ -27,7 +27,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
     const keys = key.split('.');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
         value = value[k];
@@ -35,13 +35,11 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
         return key; // Return key if translation not found
       }
     }
-    
+
     return typeof value === 'string' ? value : key;
   };
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, t }}>
-      {children}
-    </I18nContext.Provider>
+    <I18nContext.Provider value={{ language, setLanguage, t }}>{children}</I18nContext.Provider>
   );
 };

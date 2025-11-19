@@ -19,7 +19,7 @@ function normalizePhone(phone: string): string {
  * - Same name (first + last)
  * - Same date of birth
  * - Same mobile number
- * 
+ *
  * @param patient1 First patient to compare
  * @param patient2 Second patient to compare
  * @returns true if patients are potential duplicates
@@ -28,31 +28,31 @@ export function isPotentialDuplicate(patient1: Patient, patient2: Patient): bool
   // Normalize names
   const name1 = normalizeString(`${patient1.firstName} ${patient1.lastName}`);
   const name2 = normalizeString(`${patient2.firstName} ${patient2.lastName}`);
-  
+
   // Normalize dates (convert to comparable format)
   const dob1 = patient1.dateOfBirth;
   const dob2 = patient2.dateOfBirth;
-  
+
   // Normalize phones
   const phone1 = normalizePhone(patient1.phone);
   const phone2 = normalizePhone(patient2.phone);
-  
+
   // Check if name matches
   const nameMatches = name1 === name2;
-  
+
   // Check if DOB matches
   const dobMatches = dob1 === dob2;
-  
+
   // Check if phone matches
   const phoneMatches = phone1 === phone2;
-  
+
   // All three must match for duplicate
   return nameMatches && dobMatches && phoneMatches;
 }
 
 /**
  * Find potential duplicates of a patient in a list of patients
- * 
+ *
  * @param patient Patient to check
  * @param patientList List of existing patients
  * @param excludeId Optional patient ID to exclude from comparison (for updates)
@@ -63,12 +63,12 @@ export function findDuplicatePatients(
   patientList: Patient[],
   excludeId?: string
 ): Patient[] {
-  return patientList.filter(existingPatient => {
+  return patientList.filter((existingPatient) => {
     // Skip if it's the same patient (when updating)
     if (excludeId && existingPatient.id === excludeId) {
       return false;
     }
-    
+
     return isPotentialDuplicate(patient, existingPatient);
   });
 }
@@ -80,7 +80,7 @@ export function findDuplicatePatients(
 export function calculateDuplicateScore(patient1: Patient, patient2: Patient): number {
   let score = 0;
   let maxScore = 0;
-  
+
   // Name similarity (weight: 3)
   maxScore += 3;
   const name1 = normalizeString(`${patient1.firstName} ${patient1.lastName}`);
@@ -90,13 +90,13 @@ export function calculateDuplicateScore(patient1: Patient, patient2: Patient): n
   } else if (name1.includes(name2) || name2.includes(name1)) {
     score += 1.5;
   }
-  
+
   // DOB match (weight: 3)
   maxScore += 3;
   if (patient1.dateOfBirth === patient2.dateOfBirth) {
     score += 3;
   }
-  
+
   // Phone match (weight: 2)
   maxScore += 2;
   const phone1 = normalizePhone(patient1.phone);
@@ -107,13 +107,13 @@ export function calculateDuplicateScore(patient1: Patient, patient2: Patient): n
     // Last 10 digits match
     score += 1.5;
   }
-  
+
   // Email match (weight: 1)
   maxScore += 1;
   if (patient1.email.toLowerCase() === patient2.email.toLowerCase()) {
     score += 1;
   }
-  
+
   // Address similarity (weight: 1)
   maxScore += 1;
   const addr1 = normalizeString(patient1.address);
@@ -123,7 +123,7 @@ export function calculateDuplicateScore(patient1: Patient, patient2: Patient): n
   } else if (addr1.includes(addr2) || addr2.includes(addr1)) {
     score += 0.5;
   }
-  
+
   return score / maxScore;
 }
 
@@ -138,17 +138,17 @@ export function findPotentialDuplicatesWithScore(
   excludeId?: string
 ): Array<{ patient: Patient; score: number }> {
   return patientList
-    .filter(existingPatient => {
+    .filter((existingPatient) => {
       // Skip if it's the same patient (when updating)
       if (excludeId && existingPatient.id === excludeId) {
         return false;
       }
       return true;
     })
-    .map(existingPatient => ({
+    .map((existingPatient) => ({
       patient: existingPatient,
       score: calculateDuplicateScore(patient, existingPatient),
     }))
-    .filter(result => result.score >= threshold)
+    .filter((result) => result.score >= threshold)
     .sort((a, b) => b.score - a.score);
 }

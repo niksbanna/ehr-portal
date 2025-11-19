@@ -9,22 +9,23 @@ import { Patient } from '../types';
 const PatientSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-  
+
   const { data: patients, isLoading } = useQuery({
     queryKey: ['patients'],
     queryFn: () => api.getPatients(),
   });
 
-  const filteredPatients = patients?.filter((patient: Patient) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      patient.firstName.toLowerCase().includes(query) ||
-      patient.lastName.toLowerCase().includes(query) ||
-      patient.email.toLowerCase().includes(query) ||
-      patient.phone.includes(query) ||
-      patient.id.toLowerCase().includes(query)
-    );
-  }) || [];
+  const filteredPatients =
+    patients?.filter((patient: Patient) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        patient.firstName.toLowerCase().includes(query) ||
+        patient.lastName.toLowerCase().includes(query) ||
+        patient.email.toLowerCase().includes(query) ||
+        patient.phone.includes(query) ||
+        patient.id.toLowerCase().includes(query)
+      );
+    }) || [];
 
   const handlePatientClick = (patientId: string) => {
     navigate(`/patients/${patientId}`);
@@ -34,9 +35,7 @@ const PatientSearchPage = () => {
     <Layout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            Patient Search
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Patient Search</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Search for patients by name, ID, phone, or email
           </p>
@@ -44,7 +43,10 @@ const PatientSearchPage = () => {
 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Search
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="text"
               value={searchQuery}
@@ -61,7 +63,7 @@ const PatientSearchPage = () => {
               Search Results ({filteredPatients.length})
             </h2>
           </div>
-          
+
           {isLoading ? (
             <div className="p-6">
               <p className="text-gray-500 dark:text-gray-400">Loading patients...</p>
@@ -70,7 +72,9 @@ const PatientSearchPage = () => {
             <div className="p-6 text-center">
               <User className="mx-auto mb-4 text-gray-400" size={48} />
               <p className="text-gray-500 dark:text-gray-400">
-                {searchQuery ? 'No patients found matching your search' : 'Enter a search query to find patients'}
+                {searchQuery
+                  ? 'No patients found matching your search'
+                  : 'Enter a search query to find patients'}
               </p>
             </div>
           ) : (
@@ -103,9 +107,12 @@ const PatientSearchPage = () => {
                             {(() => {
                               const [day, month, year] = patient.dateOfBirth.split('-');
                               const dob = new Date(`${year}-${month}-${day}`);
-                              const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+                              const age = Math.floor(
+                                (Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+                              );
                               return age;
-                            })()}{' years'}
+                            })()}
+                            {' years'}
                           </p>
                         </div>
                         <div>

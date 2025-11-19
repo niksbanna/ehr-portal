@@ -48,9 +48,7 @@ const DashboardPage = () => {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
             {t('dashboard.title')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {t('dashboard.welcomeMessage')}
-          </p>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">{t('dashboard.welcomeMessage')}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -65,8 +63,8 @@ const DashboardPage = () => {
             statsCards.map((card) => {
               const Icon = card.icon;
               return (
-                <div 
-                  key={card.title} 
+                <div
+                  key={card.title}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow p-6"
                   role="region"
                   aria-label={card.title}
@@ -125,8 +123,8 @@ const DashboardPage = () => {
                           encounter.status === 'completed'
                             ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300'
                             : encounter.status === 'in-progress'
-                            ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
+                              ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-300'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'
                         }`}
                       >
                         {encounter.status}

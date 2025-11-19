@@ -27,16 +27,16 @@ const Layout = ({ children, activePatient, onClearPatient }: LayoutProps) => {
       >
         {t('accessibility.skipToContent')}
       </a>
-      
+
       <Sidebar />
-      
+
       <div className="flex-1 flex flex-col">
         {activePatient && onClearPatient && (
           <PatientHeader patient={activePatient} onClose={onClearPatient} />
         )}
-        
-        <main 
-          id="main-content" 
+
+        <main
+          id="main-content"
           className="flex-1 p-8"
           role="main"
           aria-label={t('accessibility.mainContent')}
