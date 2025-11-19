@@ -1,4 +1,12 @@
-import { Patient, Encounter, LabResult, Prescription, Bill, DashboardStats, User } from '../types/index';
+import {
+  Patient,
+  Encounter,
+  LabResult,
+  Prescription,
+  Bill,
+  DashboardStats,
+  User,
+} from '../types/index';
 import { AUTH_TOKEN_KEY } from '../config/api.config';
 
 // Mock user data with different roles
@@ -374,18 +382,23 @@ const mockBills: Bill[] = [
     encounterId: 'E001',
     date: '25-10-2024',
     items: [
-      { description: 'Consultation Fee - General Physician', quantity: 1, unitPrice: 500, total: 500 },
+      {
+        description: 'Consultation Fee - General Physician',
+        quantity: 1,
+        unitPrice: 500,
+        total: 500,
+      },
       { description: 'Complete Blood Count (CBC)', quantity: 1, unitPrice: 350, total: 350 },
       { description: 'Paracetamol 500mg (Strip of 10)', quantity: 2, unitPrice: 25, total: 50 },
       { description: 'Azithromycin 500mg (Strip of 3)', quantity: 1, unitPrice: 180, total: 180 },
     ],
     subtotal: 1080,
-    tax: 194.40, // 18% GST
+    tax: 194.4, // 18% GST
     discount: 0,
-    total: 1274.40,
+    total: 1274.4,
     status: 'paid',
     paymentMethod: 'UPI',
-    paidAmount: 1274.40,
+    paidAmount: 1274.4,
   },
   {
     id: 'B002',
@@ -400,12 +413,12 @@ const mockBills: Bill[] = [
       { description: 'Metformin 500mg (30 tablets)', quantity: 1, unitPrice: 120, total: 120 },
     ],
     subtotal: 1470,
-    tax: 264.60, // 18% GST
+    tax: 264.6, // 18% GST
     discount: 100, // Senior citizen discount
-    total: 1634.60,
+    total: 1634.6,
     status: 'paid',
     paymentMethod: 'Card',
-    paidAmount: 1634.60,
+    paidAmount: 1634.6,
   },
   {
     id: 'B003',
@@ -452,24 +465,29 @@ const mockBills: Bill[] = [
     encounterId: 'E005',
     date: '23-10-2024',
     items: [
-      { description: 'Cardiology Follow-up Consultation', quantity: 1, unitPrice: 1000, total: 1000 },
+      {
+        description: 'Cardiology Follow-up Consultation',
+        quantity: 1,
+        unitPrice: 1000,
+        total: 1000,
+      },
       { description: '2D Echocardiography', quantity: 1, unitPrice: 1800, total: 1800 },
       { description: 'Aspirin 75mg (30 tablets)', quantity: 1, unitPrice: 45, total: 45 },
       { description: 'Atorvastatin 20mg (30 tablets)', quantity: 1, unitPrice: 180, total: 180 },
     ],
     subtotal: 3025,
-    tax: 544.50, // 18% GST
+    tax: 544.5, // 18% GST
     discount: 200, // Insurance coverage
-    total: 3369.50,
+    total: 3369.5,
     status: 'paid',
     paymentMethod: 'Insurance',
-    paidAmount: 3369.50,
+    paidAmount: 3369.5,
   },
 ];
 
 // Mock API class
 class MockAPI {
-  private delay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
+  private delay = (ms: number = 500) => new Promise((resolve) => setTimeout(resolve, ms));
   private currentUser: User | null = null;
 
   // Authentication
@@ -477,7 +495,7 @@ class MockAPI {
     await this.delay();
     if (email && password) {
       // Find user by email or use default admin
-      const user = mockUsers.find(u => u.email === email) || mockUsers[0];
+      const user = mockUsers.find((u) => u.email === email) || mockUsers[0];
       this.currentUser = user;
       localStorage.setItem('current_user', JSON.stringify(user));
       return user;
@@ -494,15 +512,15 @@ class MockAPI {
   getCurrentUser(): User | null {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (!token) return null;
-    
+
     if (this.currentUser) return this.currentUser;
-    
+
     const savedUser = localStorage.getItem('current_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
       return this.currentUser;
     }
-    
+
     return mockUsers[0]; // Default to admin
   }
 
@@ -514,7 +532,7 @@ class MockAPI {
 
   async getPatient(id: string): Promise<Patient> {
     await this.delay();
-    const patient = mockPatients.find(p => p.id === id);
+    const patient = mockPatients.find((p) => p.id === id);
     if (!patient) throw new Error('Patient not found');
     return patient;
   }
@@ -527,7 +545,7 @@ class MockAPI {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const year = today.getFullYear();
     const registrationDate = `${day}-${month}-${year}`;
-    
+
     const newPatient: Patient = {
       ...patient,
       id: `P${String(mockPatients.length + 1).padStart(3, '0')}`,
@@ -539,7 +557,7 @@ class MockAPI {
 
   async updatePatient(id: string, updates: Partial<Patient>): Promise<Patient> {
     await this.delay();
-    const index = mockPatients.findIndex(p => p.id === id);
+    const index = mockPatients.findIndex((p) => p.id === id);
     if (index === -1) throw new Error('Patient not found');
     mockPatients[index] = { ...mockPatients[index], ...updates };
     return mockPatients[index];
@@ -547,7 +565,7 @@ class MockAPI {
 
   async deletePatient(id: string): Promise<void> {
     await this.delay();
-    const index = mockPatients.findIndex(p => p.id === id);
+    const index = mockPatients.findIndex((p) => p.id === id);
     if (index === -1) throw new Error('Patient not found');
     mockPatients.splice(index, 1);
   }
@@ -560,7 +578,7 @@ class MockAPI {
 
   async getEncounter(id: string): Promise<Encounter> {
     await this.delay();
-    const encounter = mockEncounters.find(e => e.id === id);
+    const encounter = mockEncounters.find((e) => e.id === id);
     if (!encounter) throw new Error('Encounter not found');
     return encounter;
   }
@@ -577,7 +595,7 @@ class MockAPI {
 
   async updateEncounter(id: string, updates: Partial<Encounter>): Promise<Encounter> {
     await this.delay();
-    const index = mockEncounters.findIndex(e => e.id === id);
+    const index = mockEncounters.findIndex((e) => e.id === id);
     if (index === -1) throw new Error('Encounter not found');
     mockEncounters[index] = { ...mockEncounters[index], ...updates };
     return mockEncounters[index];
@@ -591,7 +609,7 @@ class MockAPI {
 
   async getLabResult(id: string): Promise<LabResult> {
     await this.delay();
-    const result = mockLabResults.find(l => l.id === id);
+    const result = mockLabResults.find((l) => l.id === id);
     if (!result) throw new Error('Lab result not found');
     return result;
   }
@@ -608,7 +626,7 @@ class MockAPI {
 
   async updateLabResult(id: string, updates: Partial<LabResult>): Promise<LabResult> {
     await this.delay();
-    const index = mockLabResults.findIndex(l => l.id === id);
+    const index = mockLabResults.findIndex((l) => l.id === id);
     if (index === -1) throw new Error('Lab result not found');
     mockLabResults[index] = { ...mockLabResults[index], ...updates };
     return mockLabResults[index];
@@ -622,7 +640,7 @@ class MockAPI {
 
   async getPrescription(id: string): Promise<Prescription> {
     await this.delay();
-    const prescription = mockPrescriptions.find(p => p.id === id);
+    const prescription = mockPrescriptions.find((p) => p.id === id);
     if (!prescription) throw new Error('Prescription not found');
     return prescription;
   }
@@ -645,7 +663,7 @@ class MockAPI {
 
   async getBill(id: string): Promise<Bill> {
     await this.delay();
-    const bill = mockBills.find(b => b.id === id);
+    const bill = mockBills.find((b) => b.id === id);
     if (!bill) throw new Error('Bill not found');
     return bill;
   }
@@ -662,7 +680,7 @@ class MockAPI {
 
   async updateBill(id: string, updates: Partial<Bill>): Promise<Bill> {
     await this.delay();
-    const index = mockBills.findIndex(b => b.id === id);
+    const index = mockBills.findIndex((b) => b.id === id);
     if (index === -1) throw new Error('Bill not found');
     mockBills[index] = { ...mockBills[index], ...updates };
     return mockBills[index];
@@ -673,11 +691,13 @@ class MockAPI {
     await this.delay();
     return {
       totalPatients: mockPatients.length,
-      todayAppointments: mockEncounters.filter(e => 
-        new Date(e.date).toDateString() === new Date().toDateString()
+      todayAppointments: mockEncounters.filter(
+        (e) => new Date(e.date).toDateString() === new Date().toDateString()
       ).length,
-      pendingLabs: mockLabResults.filter(l => l.status === 'pending').length,
-      totalRevenue: mockBills.filter(b => b.status === 'paid').reduce((sum, b) => sum + b.total, 0),
+      pendingLabs: mockLabResults.filter((l) => l.status === 'pending').length,
+      totalRevenue: mockBills
+        .filter((b) => b.status === 'paid')
+        .reduce((sum, b) => sum + b.total, 0),
       recentEncounters: mockEncounters.slice(-5).reverse(),
       recentPatients: mockPatients.slice(-5).reverse(),
     };

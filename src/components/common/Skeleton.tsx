@@ -4,7 +4,7 @@ interface SkeletonProps {
 
 export const Skeleton = ({ className = '' }: SkeletonProps) => {
   return (
-    <div 
+    <div
       className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`}
       role="status"
       aria-label="Loading"
@@ -34,7 +34,10 @@ export const SkeletonTable = ({ rows = 5 }: { rows?: number }) => {
       </div>
       <div className="p-6 space-y-4">
         {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <div
+            key={i}
+            className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+          >
             <div className="flex-1 space-y-2">
               <Skeleton className="h-5 w-48" />
               <Skeleton className="h-4 w-32" />
@@ -52,7 +55,10 @@ export const SkeletonList = ({ items = 3 }: { items?: number }) => {
   return (
     <div className="space-y-4">
       {Array.from({ length: items }).map((_, i) => (
-        <div key={i} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <div
+          key={i}
+          className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+        >
           <div className="flex-1 space-y-2">
             <Skeleton className="h-5 w-48" />
             <Skeleton className="h-4 w-32" />

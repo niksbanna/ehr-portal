@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  FlaskConical, 
-  Pill, 
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  FlaskConical,
+  Pill,
   Receipt,
   LogOut,
   Moon,
@@ -14,7 +14,7 @@ import {
   Search,
   BarChart,
   Settings as SettingsIcon,
-  Shield
+  Shield,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
@@ -59,7 +59,11 @@ const Sidebar = () => {
           <p className="text-blue-200 dark:text-gray-400 text-sm mt-1">{t('app.subtitle')}</p>
         </div>
 
-        <nav className="flex-1 px-4" role="navigation" aria-label={t('accessibility.mainNavigation')}>
+        <nav
+          className="flex-1 px-4"
+          role="navigation"
+          aria-label={t('accessibility.mainNavigation')}
+        >
           {menuItems.map((item) => {
             const Icon = iconMap[item.icon as keyof typeof iconMap];
             const isActive = location.pathname === item.path;
@@ -109,7 +113,7 @@ const Sidebar = () => {
               <HelpCircle size={18} />
             </button>
           </div>
-          
+
           <div className="mb-3">
             <p className="text-sm text-blue-200 dark:text-gray-400">{t('auth.loggedInAs')}</p>
             <p className="font-medium">{user?.name}</p>

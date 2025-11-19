@@ -25,15 +25,15 @@ export const AUTH_TOKEN_KEY = import.meta.env.VITE_AUTH_TOKEN_KEY || 'ehr_auth_t
 export function buildApiUrl(endpoint: string): string {
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  
+
   // If API_BASE_URL is empty, return just the endpoint (for relative URLs)
   if (!API_BASE_URL) {
     return normalizedEndpoint;
   }
-  
+
   // Remove trailing slash from base URL if present
   const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
-  
+
   return `${baseUrl}${normalizedEndpoint}`;
 }
 

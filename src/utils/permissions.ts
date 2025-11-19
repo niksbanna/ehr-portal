@@ -131,24 +131,74 @@ export const canAccessRoute = (role: UserRole, path: string): boolean => {
 
   const requiredPermission = routePermissions[path];
   if (!requiredPermission) return true; // Allow access to unknown routes
-  
+
   return hasPermission(role, requiredPermission);
 };
 
 // Get navigation items based on role
 export const getNavigationItems = (role: UserRole) => {
   const items = [
-    { path: '/', permission: 'view_dashboard' as Permission, icon: 'LayoutDashboard', label: 'nav.dashboard' },
-    { path: '/patients', permission: 'view_patients' as Permission, icon: 'Users', label: 'nav.patients' },
-    { path: '/patient-search', permission: 'search_patients' as Permission, icon: 'Search', label: 'nav.patientSearch' },
-    { path: '/encounters', permission: 'view_encounters' as Permission, icon: 'FileText', label: 'nav.encounters' },
-    { path: '/labs', permission: 'view_labs' as Permission, icon: 'FlaskConical', label: 'nav.labs' },
-    { path: '/prescriptions', permission: 'view_prescriptions' as Permission, icon: 'Pill', label: 'nav.prescriptions' },
-    { path: '/billing', permission: 'view_billing' as Permission, icon: 'Receipt', label: 'nav.billing' },
-    { path: '/reports', permission: 'view_reports' as Permission, icon: 'BarChart', label: 'nav.reports' },
-    { path: '/settings', permission: 'view_settings' as Permission, icon: 'Settings', label: 'nav.settings' },
-    { path: '/audit-log', permission: 'view_audit_log' as Permission, icon: 'Shield', label: 'nav.auditLog' },
+    {
+      path: '/',
+      permission: 'view_dashboard' as Permission,
+      icon: 'LayoutDashboard',
+      label: 'nav.dashboard',
+    },
+    {
+      path: '/patients',
+      permission: 'view_patients' as Permission,
+      icon: 'Users',
+      label: 'nav.patients',
+    },
+    {
+      path: '/patient-search',
+      permission: 'search_patients' as Permission,
+      icon: 'Search',
+      label: 'nav.patientSearch',
+    },
+    {
+      path: '/encounters',
+      permission: 'view_encounters' as Permission,
+      icon: 'FileText',
+      label: 'nav.encounters',
+    },
+    {
+      path: '/labs',
+      permission: 'view_labs' as Permission,
+      icon: 'FlaskConical',
+      label: 'nav.labs',
+    },
+    {
+      path: '/prescriptions',
+      permission: 'view_prescriptions' as Permission,
+      icon: 'Pill',
+      label: 'nav.prescriptions',
+    },
+    {
+      path: '/billing',
+      permission: 'view_billing' as Permission,
+      icon: 'Receipt',
+      label: 'nav.billing',
+    },
+    {
+      path: '/reports',
+      permission: 'view_reports' as Permission,
+      icon: 'BarChart',
+      label: 'nav.reports',
+    },
+    {
+      path: '/settings',
+      permission: 'view_settings' as Permission,
+      icon: 'Settings',
+      label: 'nav.settings',
+    },
+    {
+      path: '/audit-log',
+      permission: 'view_audit_log' as Permission,
+      icon: 'Shield',
+      label: 'nav.auditLog',
+    },
   ];
 
-  return items.filter(item => hasPermission(role, item.permission));
+  return items.filter((item) => hasPermission(role, item.permission));
 };
