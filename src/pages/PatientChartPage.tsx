@@ -1,6 +1,17 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { User, Calendar, Phone, Mail, Heart, AlertCircle, FileText, Activity, Pill, DollarSign } from 'lucide-react';
+import {
+  User,
+  Calendar,
+  Phone,
+  Mail,
+  Heart,
+  AlertCircle,
+  FileText,
+  Activity,
+  Pill,
+  DollarSign,
+} from 'lucide-react';
 import { api } from '../services/api';
 import Layout from '../components/layout/Layout';
 import { SkeletonCard } from '../components/common/Skeleton';
@@ -34,10 +45,10 @@ const PatientChartPage = () => {
     queryFn: () => api.getBills(),
   });
 
-  const patientEncounters = encounters?.filter(e => e.patientId === patientId) || [];
-  const patientLabs = labResults?.filter(l => l.patientId === patientId) || [];
-  const patientPrescriptions = prescriptions?.filter(p => p.patientId === patientId) || [];
-  const patientBills = bills?.filter(b => b.patientId === patientId) || [];
+  const patientEncounters = encounters?.filter((e) => e.patientId === patientId) || [];
+  const patientLabs = labResults?.filter((l) => l.patientId === patientId) || [];
+  const patientPrescriptions = prescriptions?.filter((p) => p.patientId === patientId) || [];
+  const patientBills = bills?.filter((b) => b.patientId === patientId) || [];
 
   if (patientLoading) {
     return (
@@ -82,9 +93,7 @@ const PatientChartPage = () => {
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {patient.firstName} {patient.lastName}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">
-                  Patient ID: {patient.id}
-                </p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Patient ID: {patient.id}</p>
                 <div className="flex items-center gap-4 mt-3">
                   <span className="inline-flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                     <Calendar size={16} />
@@ -116,14 +125,18 @@ const PatientChartPage = () => {
                 <Phone size={18} className="text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Phone</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.phone}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {patient.phone}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={18} className="text-gray-400" />
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.email}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {patient.email}
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -139,8 +152,12 @@ const PatientChartPage = () => {
                 <AlertCircle size={18} className="text-orange-500 mt-1" />
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Emergency Contact</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.emergencyContact}</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{patient.emergencyPhone}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {patient.emergencyContact}
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {patient.emergencyPhone}
+                  </p>
                 </div>
               </div>
             </div>
@@ -154,18 +171,24 @@ const PatientChartPage = () => {
               {patient.allergies && (
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Allergies</p>
-                  <p className="text-sm font-medium text-red-600 dark:text-red-400">{patient.allergies}</p>
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                    {patient.allergies}
+                  </p>
                 </div>
               )}
               {patient.medicalHistory && (
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Medical History</p>
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.medicalHistory}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {patient.medicalHistory}
+                  </p>
                 </div>
               )}
               <div>
                 <p className="text-xs text-gray-500 dark:text-gray-400">Registration Date</p>
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{patient.registrationDate}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {patient.registrationDate}
+                </p>
               </div>
             </div>
           </div>
@@ -185,19 +208,28 @@ const PatientChartPage = () => {
             ) : (
               <div className="space-y-4">
                 {patientEncounters.slice(0, 5).map((encounter) => (
-                  <div key={encounter.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div
+                    key={encounter.id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">{encounter.chiefComplaint}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                          {encounter.chiefComplaint}
+                        </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           Diagnosis: {encounter.diagnosis}
                         </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        encounter.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        encounter.status === 'in-progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          encounter.status === 'completed'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : encounter.status === 'in-progress'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}
+                      >
                         {encounter.status}
                       </span>
                     </div>
@@ -225,17 +257,28 @@ const PatientChartPage = () => {
             ) : (
               <div className="space-y-3">
                 {patientLabs.slice(0, 5).map((lab) => (
-                  <div key={lab.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div
+                    key={lab.id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">{lab.testName}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{lab.testCategory}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                          {lab.testName}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {lab.testCategory}
+                        </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        lab.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        lab.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          lab.status === 'completed'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : lab.status === 'in-progress'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}
+                      >
                         {lab.status}
                       </span>
                     </div>
@@ -265,24 +308,34 @@ const PatientChartPage = () => {
             ) : (
               <div className="space-y-3">
                 {patientPrescriptions.slice(0, 5).map((prescription) => (
-                  <div key={prescription.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div
+                    key={prescription.id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {new Date(prescription.date).toLocaleDateString()} - Dr. {prescription.doctorName}
+                          {new Date(prescription.date).toLocaleDateString()} - Dr.{' '}
+                          {prescription.doctorName}
                         </p>
                         <div className="mt-2 space-y-1">
                           {prescription.medications.map((med, idx) => (
-                            <p key={idx} className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <p
+                              key={idx}
+                              className="text-sm font-medium text-gray-900 dark:text-gray-100"
+                            >
                               {med.name} - {med.dosage} ({med.frequency})
                             </p>
                           ))}
                         </div>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        prescription.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          prescription.status === 'active'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                            : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                        }`}
+                      >
                         {prescription.status}
                       </span>
                     </div>
@@ -307,19 +360,30 @@ const PatientChartPage = () => {
             ) : (
               <div className="space-y-3">
                 {patientBills.slice(0, 5).map((bill) => (
-                  <div key={bill.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div
+                    key={bill.id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">Bill #{bill.id}</p>
+                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                          Bill #{bill.id}
+                        </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{bill.date}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-gray-900 dark:text-gray-100">₹{bill.total.toFixed(2)}</p>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          bill.status === 'paid' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                          bill.status === 'partially-paid' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                          'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                        }`}>
+                        <p className="font-bold text-gray-900 dark:text-gray-100">
+                          ₹{bill.total.toFixed(2)}
+                        </p>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            bill.status === 'paid'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : bill.status === 'partially-paid'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                          }`}
+                        >
                           {bill.status}
                         </span>
                       </div>

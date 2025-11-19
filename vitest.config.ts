@@ -13,6 +13,7 @@ export default defineConfig({
       '**/node_modules/**',
       '**/dist/**',
       '**/e2e/**',
+      '**/backend/**',
       '**/.{idea,git,cache,output,temp}/**',
     ],
     coverage: {

@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Settings as SettingsIcon, Moon, Sun, Globe, Bell, Clock, Calendar as CalendarIcon, Save } from 'lucide-react';
+import {
+  Settings as SettingsIcon,
+  Moon,
+  Sun,
+  Globe,
+  Bell,
+  Clock,
+  Calendar as CalendarIcon,
+  Save,
+} from 'lucide-react';
 import Layout from '../components/layout/Layout';
 import { useTheme } from '../hooks/useTheme';
 import { useI18n } from '../hooks/useI18n';
@@ -7,13 +16,13 @@ import { useI18n } from '../hooks/useI18n';
 const SettingsPage = () => {
   const { theme, setTheme } = useTheme();
   const { language, setLanguage } = useI18n();
-  
+
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
     push: true,
   });
-  
+
   const [dateFormat, setDateFormat] = useState('DD-MM-YYYY');
   const [timeFormat, setTimeFormat] = useState('12h');
 
@@ -37,9 +46,7 @@ const SettingsPage = () => {
           <div className="p-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
               {theme === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Appearance
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Appearance</h2>
             </div>
           </div>
           <div className="p-6">

@@ -8,7 +8,8 @@ import { indianMobileRegex, pincodeRegex, ddMMyyyyRegex, aadhaarRegex } from './
 export const PatientFormSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(50, 'First name too long'),
   lastName: z.string().min(1, 'Last name is required').max(50, 'Last name too long'),
-  dateOfBirth: z.string()
+  dateOfBirth: z
+    .string()
     .regex(ddMMyyyyRegex, 'Date must be in DD-MM-YYYY format')
     .refine((date) => {
       const [day, month, year] = date.split('-').map(Number);
@@ -20,8 +21,12 @@ export const PatientFormSchema = z.object({
   gender: z.enum(['male', 'female', 'other'], {
     required_error: 'Gender is required',
   }),
-  phone: z.string()
-    .regex(indianMobileRegex, 'Invalid Indian mobile number (format: +91XXXXXXXXXX or 10 digits starting with 6-9)')
+  phone: z
+    .string()
+    .regex(
+      indianMobileRegex,
+      'Invalid Indian mobile number (format: +91XXXXXXXXXX or 10 digits starting with 6-9)'
+    )
     .transform((val) => {
       // Normalize to +91 format
       const cleaned = val.replace(/\D/g, '');
@@ -33,7 +38,8 @@ export const PatientFormSchema = z.object({
       return val;
     }),
   email: z.string().email('Invalid email address'),
-  aadhaar: z.string()
+  aadhaar: z
+    .string()
     .regex(aadhaarRegex, 'Invalid Aadhaar number (must be 12 digits)')
     .optional()
     .or(z.literal('')),
@@ -42,8 +48,7 @@ export const PatientFormSchema = z.object({
   state: z.string().min(1, 'State is required').max(50, 'State name too long'),
   pincode: z.string().regex(pincodeRegex, 'Invalid pincode (must be 6 digits)'),
   emergencyContact: z.string().min(1, 'Emergency contact name is required'),
-  emergencyPhone: z.string()
-    .regex(indianMobileRegex, 'Invalid Indian mobile number'),
+  emergencyPhone: z.string().regex(indianMobileRegex, 'Invalid Indian mobile number'),
   bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', '']).optional(),
   allergies: z.string().max(500, 'Allergies description too long').optional(),
   medicalHistory: z.string().max(1000, 'Medical history too long').optional(),
@@ -61,7 +66,8 @@ export const EncounterFormSchema = z.object({
     required_error: 'Encounter type is required',
   }),
   chiefComplaint: z.string().min(1, 'Chief complaint is required'),
-  diagnosisCode: z.string()
+  diagnosisCode: z
+    .string()
     .regex(/^[A-Z]\d{2}(\.[0-9A-Z]{1,4})?$/, 'Invalid ICD-10 code format (e.g., J06.9, E11.9)')
     .optional()
     .or(z.literal('')),
@@ -69,7 +75,8 @@ export const EncounterFormSchema = z.object({
   notes: z.string().optional(),
   // Vital signs (optional)
   temperature: z.number().min(90).max(115).optional().or(z.nan()),
-  bloodPressure: z.string()
+  bloodPressure: z
+    .string()
     .regex(/^\d{2,3}\/\d{2,3}$/, 'Invalid blood pressure format (e.g., 120/80)')
     .optional()
     .or(z.literal('')),
