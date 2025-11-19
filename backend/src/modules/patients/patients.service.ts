@@ -3,7 +3,6 @@ import { CreatePatientDto, UpdatePatientDto } from './dto/patient.dto';
 import { PatientRepository } from './repositories/patient.repository';
 import { PatientMapper } from './mappers/patient.mapper';
 import { ApiResponse, PaginatedResponse } from '../../common/dto/response.dto';
-import { PatientResponseDto } from './dto/patient-response.dto';
 
 @Injectable()
 export class PatientsService {
@@ -41,7 +40,7 @@ export class PatientsService {
       const patient = await this.patientRepository.update(id, updatePatientDto);
       const responseDto = PatientMapper.toResponseDto(patient);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
   }
@@ -51,7 +50,7 @@ export class PatientsService {
       const patient = await this.patientRepository.remove(id);
       const responseDto = PatientMapper.toResponseDto(patient);
       return new ApiResponse(responseDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Patient with ID ${id} not found`);
     }
   }

@@ -35,7 +35,7 @@ export class PrescriptionsService {
   async update(id: string, updatePrescriptionDto: UpdatePrescriptionDto) {
     try {
       return await this.prescriptionRepository.update(id, updatePrescriptionDto);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Prescription with ID ${id} not found`);
     }
   }
@@ -43,7 +43,7 @@ export class PrescriptionsService {
   async remove(id: string) {
     try {
       return await this.prescriptionRepository.remove(id);
-    } catch (error) {
+    } catch (_error) {
       throw new NotFoundException(`Prescription with ID ${id} not found`);
     }
   }

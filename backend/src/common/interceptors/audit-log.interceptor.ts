@@ -9,7 +9,7 @@ import { maskSensitiveData } from '../utils/data-masking.util';
 export class AuditLogInterceptor implements NestInterceptor {
   constructor(private prisma: PrismaService) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const request = context.switchToHttp().getRequest();
     const { method, url, body, user } = request;
 
@@ -36,8 +36,6 @@ export class AuditLogInterceptor implements NestInterceptor {
 
     // Mask sensitive data in request body
     const maskedBody = maskSensitiveData(body);
-
-    const startTime = Date.now();
 
     return next.handle().pipe(
       tap((response) => {
@@ -129,7 +127,7 @@ export class AuditLogInterceptor implements NestInterceptor {
     action: string;
     entity: string;
     entityId: string | null;
-    changes: any;
+    changes: unknown;
     ipAddress: string;
     userAgent: string;
     status: string;

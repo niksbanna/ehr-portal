@@ -31,4 +31,12 @@ module.exports = {
     ],
     'no-console': 'warn',
   },
+  overrides: [
+    {
+      files: ['test/**/*.ts'],
+      parserOptions: {
+        project: null,
+      },
+    },
+  ],
 };

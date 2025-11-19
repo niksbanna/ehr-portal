@@ -49,12 +49,12 @@ async function bootstrap() {
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
-    
+
     // Setup Swagger UI at /api/docs
     SwaggerModule.setup(configService.get('swagger.path'), app, document, {
       jsonDocumentUrl: 'docs-json',
     });
-    
+
     // Export OpenAPI JSON to file for static access (async to avoid blocking)
     const outputPath = path.join(process.cwd(), 'openapi.json');
     fs.writeFile(outputPath, JSON.stringify(document, null, 2))
@@ -68,9 +68,7 @@ async function bootstrap() {
   console.log(
     `Swagger documentation: http://localhost:${port}/${configService.get('swagger.path')}`,
   );
-  console.log(
-    `OpenAPI JSON: http://localhost:${port}/${configService.get('swagger.path')}-json`,
-  );
+  console.log(`OpenAPI JSON: http://localhost:${port}/${configService.get('swagger.path')}-json`);
 }
 
 bootstrap();
