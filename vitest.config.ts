@@ -14,6 +14,7 @@ export default defineConfig({
       '**/dist/**',
       '**/e2e/**',
       '**/backend/**',
+      '**/src/tests/**', // Symlink to src/test - exclude to avoid running tests twice
       '**/.{idea,git,cache,output,temp}/**',
     ],
     coverage: {
